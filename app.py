@@ -23,7 +23,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS Styling
+# CSS Styling (simplified)
 st.markdown("""
 <style>
     .main-header {
@@ -59,42 +59,41 @@ def load_models():
     models = {}
     model_status = {}
     
-    # Get the directory of the current script
+    # Determine absolute path to models directory (ai_human_detection_project/models)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    models_dir = os.path.join(current_dir, "models")
+    models_dir = os.path.join(current_dir, 'ai_human_detection_project', 'models')
     
-    # Debug: Show what directory we're looking in
+    # Display debug info for troubleshooting
     st.write(f"Looking for models in: {models_dir}")
-    st.write(f"Current working directory: {os.getcwd()}")
-    st.write(f"Files in models directory: {os.listdir(models_dir) if os.path.exists(models_dir) else 'Directory not found'}")
+    if not os.path.exists(models_dir):
+        st.error(f"Models directory not found: {models_dir}")
+        return None, None
     
     try:
         # Load TF-IDF vectorizer
-        vectorizer_path = os.path.join(models_dir, "tfidf_vectorizer.pkl")
-        models["vectorizer"] = joblib.load(vectorizer_path)
-        model_status["vectorizer"] = True
+        vectorizer_path = os.path.join(models_dir, 'tfidf_vectorizer.pkl')
+        models['vectorizer'] = joblib.load(vectorizer_path)
+        model_status['vectorizer'] = True
         
         # Load SVM model
-        svm_path = os.path.join(models_dir, "svm_model.pkl")
-        models["svm"] = joblib.load(svm_path)
-        model_status["svm"] = True
+        svm_path = os.path.join(models_dir, 'svm_model.pkl')
+        models['svm'] = joblib.load(svm_path)
+        model_status['svm'] = True
         
         # Load Decision Tree model
-        dt_path = os.path.join(models_dir, "decision_tree_model.pkl")
-        models["decision_tree"] = joblib.load(dt_path)
-        model_status["decision_tree"] = True
+        dt_path = os.path.join(models_dir, 'decision_tree_model.pkl')
+        models['decision_tree'] = joblib.load(dt_path)
+        model_status['decision_tree'] = True
         
         # Load AdaBoost model
-        ada_path = os.path.join(models_dir, "adaboost_model.pkl")
-        models["adaboost"] = joblib.load(ada_path)
-        model_status["adaboost"] = True
+        ada_path = os.path.join(models_dir, 'adaboost_model.pkl')
+        models['adaboost'] = joblib.load(ada_path)
+        model_status['adaboost'] = True
         
         return models, model_status
-        
     except FileNotFoundError as e:
         st.error(f"Error loading models: {e}")
-        st.error("Please ensure all model files are in the 'models/' directory")
-        st.error(f"Looking in: {models_dir}")
+        st.error("Please ensure all model files are in the 'ai_human_detection_project/models' directory")
         return None, None
     except Exception as e:
         st.error(f"Unexpected error loading models: {e}")
@@ -106,10 +105,10 @@ def preprocess_text(text):
     text = text.lower()
     
     # Remove special characters and digits
-    text = re.sub(r"[^a-zA-Z\s]", "", text)
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
     
     # Remove extra whitespace
-    text = " ".join(text.split())
+    text = ' '.join(text.split())
     
     return text
 
@@ -123,7 +122,7 @@ def make_prediction(text, model_name, models):
         processed_text = preprocess_text(text)
         
         # Transform text using TF-IDF vectorizer
-        X = models["vectorizer"].transform([processed_text])
+        X = models['vectorizer'].transform([processed_text])
         
         # Make prediction with selected model
         model = models[model_name]
@@ -143,11 +142,11 @@ def create_confidence_chart(probabilities):
     """Create a confidence visualization"""
     fig = go.Figure(data=[
         go.Bar(
-            x=["Human-Written", "AI-Generated"],
+            x=['Human-Written', 'AI-Generated'],
             y=[probabilities[0], probabilities[1]],
-            marker_color=["#17a2b8", "#ffc107"],
-            text=[f"{probabilities[0]:.1%}", f"{probabilities[1]:.1%}"],
-            textposition="auto",
+            marker_color=['#17a2b8', '#ffc107'],
+            text=[f'{probabilities[0]:.1%}', f'{probabilities[1]:.1%}'],
+            textposition='auto',
         )
     ])
     
@@ -161,7 +160,7 @@ def create_confidence_chart(probabilities):
     return fig
 
 # Main App
-st.markdown("<h1 class="main-header">🤖 AI vs Human Text Detection</h1>", unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">🤖 AI vs Human Text Detection</h1>', unsafe_allow_html=True)
 
 # Sidebar navigation
 page = st.sidebar.selectbox(
@@ -174,7 +173,7 @@ page = st.sidebar.selectbox(
 models, model_status = load_models()
 
 if models is None:
-    st.error("Failed to load models. Please check that all model files are present in the 'models/' directory.")
+    st.error("Failed to load models. Please check that all model files are present in the 'ai_human_detection_project/models' directory.")
     st.stop()
 
 # HOME PAGE
@@ -232,12 +231,12 @@ elif page == "🔮 Single Text Analysis":
                     # Display prediction
                     if prediction == 1:  # AI-generated
                         st.markdown(
-                            f"<div class="prediction-result ai-prediction">🤖 AI-Generated Text Detected<br/>Confidence: {confidence:.2%}</div>",
+                            f'<div class="prediction-result ai-prediction">🤖 AI-Generated Text Detected<br/>Confidence: {confidence:.2%}</div>',
                             unsafe_allow_html=True
                         )
                     else:  # Human-written
                         st.markdown(
-                            f"<div class="prediction-result human-prediction">👤 Human-Written Text Detected<br/>Confidence: {confidence:.2%}</div>",
+                            f'<div class="prediction-result human-prediction">👤 Human-Written Text Detected<br/>Confidence: {confidence:.2%}</div>',
                             unsafe_allow_html=True
                         )
                     
@@ -267,8 +266,8 @@ elif page == "⚖️ Model Comparison":
     if st.button("🔀 Compare Models", type="primary"):
         if comparison_text.strip():
             with st.spinner("Running all models..."):
-                model_names = ["svm", "decision_tree", "adaboost"]
-                model_labels = ["SVM", "Decision Tree", "AdaBoost"]
+                model_names = ['svm', 'decision_tree', 'adaboost']
+                model_labels = ['SVM', 'Decision Tree', 'AdaBoost']
                 
                 results = []
                 for i, model_name in enumerate(model_names):
@@ -276,11 +275,11 @@ elif page == "⚖️ Model Comparison":
                     if pred is not None:
                         pred_label = "AI-Generated" if pred == 1 else "Human-Written"
                         results.append({
-                            "Model": model_labels[i],
-                            "Prediction": pred_label,
-                            "Confidence": f"{conf:.2%}",
-                            "Human Prob": f"{probs[0]:.2%}",
-                            "AI Prob": f"{probs[1]:.2%}"
+                            'Model': model_labels[i],
+                            'Prediction': pred_label,
+                            'Confidence': f"{conf:.2%}",
+                            'Human Prob': f"{probs[0]:.2%}",
+                            'AI Prob': f"{probs[1]:.2%}"
                         })
                 
                 if results:
@@ -290,15 +289,15 @@ elif page == "⚖️ Model Comparison":
             st.warning("Please enter some text to compare.")
 
 # MODEL PERFORMANCE
-elif page == "�� Model Performance":
+elif page == "📊 Model Performance":
     st.markdown("### Model Performance Metrics")
     
     performance_data = {
-        "Model": ["SVM", "Decision Tree", "AdaBoost"],
-        "Accuracy": [96.38, 84.99, 85.50],
-        "Precision": [96.38, 85.02, 85.45],
-        "Recall": [96.38, 84.99, 85.50],
-        "F1-Score": [96.38, 84.98, 85.47]
+        'Model': ['SVM', 'Decision Tree', 'AdaBoost'],
+        'Accuracy': [96.38, 84.99, 85.50],
+        'Precision': [96.38, 85.02, 85.45],
+        'Recall': [96.38, 84.99, 85.50],
+        'F1-Score': [96.38, 84.98, 85.47]
     }
     
     df = pd.DataFrame(performance_data)
@@ -307,11 +306,11 @@ elif page == "�� Model Performance":
     # Create accuracy chart
     fig = go.Figure(data=[
         go.Bar(
-            x=performance_data["Model"],
-            y=performance_data["Accuracy"],
-            text=[f"{acc}%" for acc in performance_data["Accuracy"]],
-            textposition="auto",
-            marker_color=["#4ecdc4", "#ffc107", "#ff6b6b"]
+            x=performance_data['Model'],
+            y=performance_data['Accuracy'],
+            text=[f'{acc}%' for acc in performance_data['Accuracy']],
+            textposition='auto',
+            marker_color=['#4ecdc4', '#ffc107', '#ff6b6b']
         )
     ])
     
