@@ -4,7 +4,6 @@ import numpy as np
 import pickle
 import os
 import re
-import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 import plotly.graph_objects as go
 import plotly.express as px
@@ -59,7 +58,7 @@ def load_models():
     models = {}
     model_status = {}
     
-    # Determine absolute path to models directory (ai_human_detection_project/models)
+    # Determine absolute path to models directory (models)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     models_dir = os.path.join(current_dir, 'ai_human_detection_project', 'models')
     
@@ -93,7 +92,7 @@ def load_models():
         return models, model_status
     except FileNotFoundError as e:
         st.error(f"Error loading models: {e}")
-        st.error("Please ensure all model files are in the 'ai_human_detection_project/models' directory")
+        st.error("Please ensure all model files are in the 'models' directory")
         return None, None
     except Exception as e:
         st.error(f"Unexpected error loading models: {e}")
@@ -173,7 +172,7 @@ page = st.sidebar.selectbox(
 models, model_status = load_models()
 
 if models is None:
-    st.error("Failed to load models. Please check that all model files are present in the 'ai_human_detection_project/models' directory.")
+    st.error("Failed to load models. Please check that all model files are present in the 'models' directory.")
     st.stop()
 
 # HOME PAGE
