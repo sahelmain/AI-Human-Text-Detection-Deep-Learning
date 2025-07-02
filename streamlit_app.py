@@ -14,13 +14,41 @@ import seaborn as sns
 from wordcloud import WordCloud
 import base64
 import io
+import nltk
 
 # Import our utility functions
 from utils import (
     extract_text_from_pdf, extract_text_from_docx, 
     extract_text_statistics, analyze_text_features,
-    generate_analysis_report, create_downloadable_excel_report
+    generate_analysis_report, create_downloadable_excel_report,
+    download_nltk_requirements
 )
+
+# Download NLTK data at startup
+@st.cache_resource
+def setup_nltk():
+    """Download and setup NLTK requirements once"""
+    try:
+        # Create a placeholder for status
+        status_placeholder = st.empty()
+        status_placeholder.info("🔄 Setting up NLTK data for text analysis...")
+        
+        download_nltk_requirements()
+        
+        status_placeholder.success("✅ NLTK data loaded successfully!")
+        # Clear the message after 2 seconds
+        import time
+        time.sleep(2)
+        status_placeholder.empty()
+        
+        return True
+    except Exception as e:
+        st.error(f"❌ Failed to download NLTK requirements: {e}")
+        st.warning("⚠️ Some text analysis features may not work properly.")
+        return False
+
+# Setup NLTK data
+setup_nltk()
 
 # Import joblib with fallback
 try:
