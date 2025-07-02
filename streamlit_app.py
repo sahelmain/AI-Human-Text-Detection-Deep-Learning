@@ -217,6 +217,25 @@ st.markdown("""
         color: white !important;
     }
     
+    /* Fix dropdown options text color */
+    .stSelectbox [data-baseweb="select"] [role="option"] {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
+    
+    /* Fix dropdown menu background and text */
+    .stSelectbox [data-baseweb="select"] [role="listbox"] {
+        background-color: white !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    
+    /* Fix selected option text in dropdown */
+    .stSelectbox [data-baseweb="select"] [role="option"]:hover {
+        background-color: #f8f9fa !important;
+        color: #2c3e50 !important;
+    }
+    
     /* Force all text to be white for visibility */
     .stMarkdown, .stText, h1, h2, h3, h4, h5, h6, p, div, span, label {
         color: white !important;
