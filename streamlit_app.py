@@ -448,6 +448,22 @@ st.markdown("""
     .main-header, .feature-card, .model-card, .prediction-result {
         color: white !important;
     }
+    
+    /* OVERRIDE: Force dropdown text to be dark - must come AFTER global white text rule */
+    .stSelectbox * {
+        color: #2c3e50 !important;
+    }
+    
+    .stSelectbox [role="option"], 
+    .stSelectbox [role="listbox"], 
+    .stSelectbox [role="listbox"] *,
+    .stSelectbox ul li,
+    .stSelectbox div[data-baseweb="select"] *,
+    .stSelectbox [data-baseweb="menu"] *,
+    [data-testid="stSelectbox"] * {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
