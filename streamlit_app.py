@@ -217,22 +217,53 @@ st.markdown("""
         color: white !important;
     }
     
-    /* Fix dropdown options text color */
+    /* Comprehensive dropdown text fixes */
     .stSelectbox [data-baseweb="select"] [role="option"] {
         color: #2c3e50 !important;
         background-color: white !important;
     }
     
-    /* Fix dropdown menu background and text */
     .stSelectbox [data-baseweb="select"] [role="listbox"] {
         background-color: white !important;
         border-radius: 8px !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
     }
     
-    /* Fix selected option text in dropdown */
     .stSelectbox [data-baseweb="select"] [role="option"]:hover {
         background-color: #f8f9fa !important;
+        color: #2c3e50 !important;
+    }
+    
+    /* Additional dropdown targeting */
+    .stSelectbox ul[role="listbox"] li {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
+    
+    .stSelectbox ul[role="listbox"] {
+        background-color: white !important;
+    }
+    
+    /* Target all dropdown menu items */
+    .stSelectbox div[data-baseweb="menu"] div {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
+    
+    /* Target emotion cache classes for dropdown */
+    .st-emotion-cache-1p0m4ay, .st-emotion-cache-10oheav, .st-emotion-cache-1erivf3 {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
+    
+    /* Force all select dropdown options */
+    .stSelectbox [role="option"], .stSelectbox li {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
+    
+    /* Override any emotion cache dropdown styling */
+    .stSelectbox [class*="emotion-cache"] {
         color: #2c3e50 !important;
     }
     
