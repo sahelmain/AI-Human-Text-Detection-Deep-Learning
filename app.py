@@ -47,23 +47,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Cursor-Inspired Dark Gradient CSS
+# Streamlit Cloud Compatible CSS
 st.markdown("""
 <style>
-    /* Import Google Fonts */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    /* Global Styles */
+    /* Global Styles - Using system fonts for better compatibility */
     .main {
-        font-family: 'Inter', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #d946ef 50%, #f97316 75%, #84cc16 100%);
         min-height: 100vh;
     }
     
     /* Header Styling */
     .main-header {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
         padding: 3rem;
         border-radius: 20px;
         margin-bottom: 2rem;
@@ -89,8 +85,7 @@ st.markdown("""
     
     /* Card Styling */
     .feature-card {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
         padding: 2rem;
         border-radius: 20px;
         margin: 1rem 0;
@@ -122,8 +117,7 @@ st.markdown("""
     
     /* Model Cards */
     .model-card {
-        background: rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2));
         color: white;
         padding: 1.5rem;
         border-radius: 16px;
@@ -136,7 +130,7 @@ st.markdown("""
     .model-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-        background: rgba(0, 0, 0, 0.3);
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3));
     }
     
     .model-name {
@@ -169,19 +163,18 @@ st.markdown("""
         font-size: 1.8rem;
         font-weight: 600;
         box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        backdrop-filter: blur(20px);
         border: 2px solid;
     }
     
     .ai-prediction {
-        background: rgba(239, 68, 68, 0.15);
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
         color: #fca5a5;
         border-color: #ef4444;
         text-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
     }
     
     .human-prediction {
-        background: rgba(59, 130, 246, 0.15);
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
         color: #93c5fd;
         border-color: #3b82f6;
         text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
@@ -189,109 +182,99 @@ st.markdown("""
     
     /* Buttons */
     .stButton > button {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-        backdrop-filter: blur(10px);
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3) !important;
     }
     
     .stButton > button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
-        background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5) !important;
+        background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
     }
     
     /* Sidebar */
-    .sidebar .sidebar-content {
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(20px);
-        border-radius: 0 20px 20px 0;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .css-1d391kg {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)) !important;
     }
     
     /* Navigation */
     .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(20px);
-        color: white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
     }
     
     /* Metrics */
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 1.5rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        border: 1px solid rgba(255,255,255,0.18);
-        color: white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        border-radius: 20px !important;
+        padding: 1.5rem !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
+        border: 1px solid rgba(255,255,255,0.18) !important;
+        color: white !important;
     }
     
     /* Text Areas */
     .stTextArea > div > div > textarea {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border-radius: 16px;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        padding: 1rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        color: white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        border-radius: 16px !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 1rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        color: white !important;
     }
     
     .stTextArea > div > div > textarea:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
+        border-color: #8b5cf6 !important;
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.4) !important;
     }
     
     /* File Uploader */
     [data-testid="stFileUploader"] {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 2rem;
-        border: 2px dashed rgba(255, 255, 255, 0.3);
-        text-align: center;
-        transition: all 0.3s ease;
-        color: white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        border-radius: 20px !important;
+        padding: 2rem !important;
+        border: 2px dashed rgba(255, 255, 255, 0.3) !important;
+        text-align: center !important;
+        transition: all 0.3s ease !important;
+        color: white !important;
     }
     
     [data-testid="stFileUploader"]:hover {
-        border-color: #8b5cf6;
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        border-color: #8b5cf6 !important;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1)) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.2) !important;
     }
     
     /* Progress Bar */
     .stProgress > div > div > div {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        border-radius: 10px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+        border-radius: 10px !important;
     }
     
     /* Tables */
     .stDataFrame {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        border-radius: 20px !important;
+        overflow: hidden !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: white !important;
     }
     
     /* Sections */
     .section-header {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
         padding: 1.5rem;
         border-radius: 20px;
         margin: 2rem 0 1rem 0;
@@ -310,8 +293,7 @@ st.markdown("""
     
     /* Download Section */
     .download-section {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
         padding: 2rem;
         border-radius: 20px;
         margin: 2rem 0;
@@ -329,17 +311,16 @@ st.markdown("""
         border-radius: 25px;
         font-weight: 500;
         font-size: 0.9rem;
-        backdrop-filter: blur(10px);
     }
     
     .status-available {
-        background: rgba(16, 185, 129, 0.2);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.2));
         color: #34d399;
         border: 1px solid rgba(16, 185, 129, 0.3);
     }
     
     .status-unavailable {
-        background: rgba(239, 68, 68, 0.2);
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.2));
         color: #fca5a5;
         border: 1px solid rgba(239, 68, 68, 0.3);
     }
@@ -371,6 +352,21 @@ st.markdown("""
             padding: 1.5rem;
         }
     }
+    
+    /* Force white text for better visibility */
+    .stMarkdown, .stText {
+        color: white !important;
+    }
+    
+    /* Override Streamlit's default styles */
+    .stApp {
+        background: transparent !important;
+    }
+    
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
