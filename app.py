@@ -47,62 +47,312 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced CSS Styling
+# Enhanced Custom CSS for Professional UI
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: 700;
-        text-align: center;
-        color: #2E8B57;
-        margin-bottom: 2rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    /* Import Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    /* Global Styles */
+    .main {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
     }
-    .prediction-result {
+    
+    /* Header Styling */
+    .main-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+    
+    .main-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00d4ff, #090979);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .main-subtitle {
+        font-size: 1.3rem;
+        color: #e0e6ed;
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+    
+    /* Card Styling */
+    .feature-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 1rem 0;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.18);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .feature-description {
+        font-size: 1rem;
+        color: #5a6c7d;
+        line-height: 1.6;
+    }
+    
+    /* Model Cards */
+    .model-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
         padding: 1.5rem;
         border-radius: 15px;
-        margin: 1rem 0;
+        margin: 0.5rem 0;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .model-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+    
+    .model-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .model-accuracy {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #00ff88;
+        margin: 0.5rem 0;
+    }
+    
+    .model-description {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        line-height: 1.4;
+    }
+    
+    /* Prediction Results */
+    .prediction-result {
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 2rem 0;
         text-align: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        font-size: 1.8rem;
+        font-weight: 600;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid transparent;
+        animation: glow 2s ease-in-out infinite alternate;
     }
+    
     .ai-prediction {
-        background: linear-gradient(135deg, #ffebee, #ffcdd2);
-        color: #c62828;
-        border: 3px solid #c62828;
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+        border-color: #ff6b6b;
     }
+    
     .human-prediction {
-        background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-        color: #2e7d32;
-        border: 3px solid #2e7d32;
+        background: linear-gradient(135deg, #00d2d3, #54a0ff);
+        color: white;
+        border-color: #00d2d3;
     }
-    .metric-card {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        border-left: 4px solid #007bff;
-        margin: 0.5rem 0;
+    
+    @keyframes glow {
+        from { box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        to { box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
     }
-    .feature-importance {
-        background-color: #fff3cd;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid #ffc107;
-        margin: 1rem 0;
+    
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
     }
-    .download-section {
-        background-color: #d1ecf1;
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    /* Sidebar */
+    .sidebar .sidebar-content {
+        background: linear-gradient(180deg, #2c3e50, #34495e);
+        border-radius: 0 20px 20px 0;
+    }
+    
+    /* Navigation */
+    .stSelectbox > div > div {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Metrics */
+    [data-testid="metric-container"] {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
         padding: 1.5rem;
-        border-radius: 10px;
-        border: 1px solid #bee5eb;
-        margin: 1rem 0;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.18);
+        backdrop-filter: blur(10px);
     }
-    .stats-container {
-        background-color: #f8f9fa;
+    
+    /* Text Areas */
+    .stTextArea > div > div > textarea {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        border: 2px solid #e1e8ed;
         padding: 1rem;
-        border-radius: 8px;
-        margin: 0.5rem 0;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .stTextArea > div > div > textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* File Uploader */
+    [data-testid="stFileUploader"] {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 2px dashed #667eea;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    
+    [data-testid="stFileUploader"]:hover {
+        border-color: #764ba2;
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    /* Progress Bar */
+    .stProgress > div > div > div {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+    }
+    
+    /* Tables */
+    .stDataFrame {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Sections */
+    .section-header {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin: 2rem 0 1rem 0;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    /* Download Section */
+    .download-section {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 2rem 0;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+    
+    /* Status Indicators */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .status-available {
+        background: linear-gradient(135deg, #00d2d3, #54a0ff);
+        color: white;
+    }
+    
+    .status-unavailable {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        color: white;
+    }
+    
+    /* Animation for loading */
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .loading {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2.5rem;
+        }
+        .main-subtitle {
+            font-size: 1.1rem;
+        }
+        .feature-card {
+            padding: 1.5rem;
+        }
+        .prediction-result {
+            font-size: 1.4rem;
+            padding: 1.5rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -425,14 +675,26 @@ def get_download_link(file_bytes, file_name, file_type):
     return href 
 
 # Main App
-st.markdown('<h1 class="main-header">🤖 AI vs Human Text Detection System</h1>', unsafe_allow_html=True)
+# Main Header with Enhanced Styling
+st.markdown("""
+<div class="main-header">
+    <h1 class="main-title">🤖 AI vs Human Text Detection</h1>
+    <p class="main-subtitle">Advanced Machine Learning & Deep Learning Classification System</p>
+</div>
+""", unsafe_allow_html=True)
 
-# Sidebar navigation
-st.sidebar.markdown("### 🧭 Navigation")
+# Enhanced Sidebar Navigation
+st.sidebar.markdown("""
+<div style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; margin-bottom: 1rem;">
+    <h2 style="color: white; margin: 0; font-weight: 600;">🧭 Navigation</h2>
+</div>
+""", unsafe_allow_html=True)
+
 page = st.sidebar.selectbox(
     "Select Page:",
     ["🏠 Home", "🔮 Text Analysis", "📁 File Upload", "⚖️ Model Comparison", "📊 Model Performance", "📈 Advanced Analytics"],
-    index=0
+    index=0,
+    help="Choose a page to navigate to different features"
 )
 
 # Load models
@@ -442,59 +704,203 @@ if models is None:
     st.error("Failed to load models. Please check that model files are present.")
     st.stop()
 
-# Display available models in sidebar
-st.sidebar.markdown("### 🤖 Available Models")
+# Enhanced Model Status in Sidebar
+st.sidebar.markdown("""
+<div style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-radius: 15px; margin: 1rem 0;">
+    <h3 style="color: #2c3e50; margin: 0; font-weight: 600;">🤖 Available Models</h3>
+</div>
+""", unsafe_allow_html=True)
+
 available_models = [k for k in models.keys() if k not in ['vectorizer', 'vocab_to_idx', 'model_configs']]
+
+# Model accuracy mapping
+model_accuracies = {
+    'svm': '96.38%',
+    'decision_tree': '84.99%', 
+    'adaboost': '85.50%',
+    'cnn': '97.33%',
+    'lstm': '94.52%',
+    'rnn': '82.75%'
+}
+
 for model in available_models:
-    st.sidebar.success(f"✅ {model.upper()}")
+    accuracy = model_accuracies.get(model, 'N/A')
+    model_display = model.replace('_', ' ').title()
+    
+    st.sidebar.markdown(f"""
+    <div style="
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem 0;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #00d2d3, #54a0ff);
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        width: 100%;
+        box-sizing: border-box;
+    ">
+        ✅ {model_display} ({accuracy})
+    </div>
+    """, unsafe_allow_html=True)
 
 # HOME PAGE
 if page == "🏠 Home":
+    # Welcome Section
     st.markdown("""
-    ### Welcome to the Complete AI vs Human Text Detection System
+    <div class="feature-card">
+        <h2 class="feature-title">🎯 Welcome to the Complete AI vs Human Text Detection System</h2>
+        <p class="feature-description">
+            This comprehensive application uses both traditional machine learning and cutting-edge deep learning to 
+            distinguish between AI-generated and human-written text with <strong>up to 97.33% accuracy</strong>.
+            Built with 6 advanced models and professional-grade analytics.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    This comprehensive application uses both traditional machine learning and cutting-edge deep learning 
-    to distinguish between AI-generated and human-written text with high accuracy.
+    # Key Features Section
+    st.markdown("""
+    <div class="section-header">
+        <h2 class="section-title">✨ Key Features</h2>
+    </div>
+    """, unsafe_allow_html=True)
     
-    #### 🌟 **Key Features:**
-    - **📝 Multiple Input Methods**: Type text directly, paste content, or upload PDF/Word documents
-    - **🤖 6 Advanced Models**: Choose from SVM, Decision Tree, AdaBoost, CNN, LSTM, and RNN
-    - **📊 Real-time Predictions**: Instant AI vs Human classification with confidence scores
-    - **📈 Advanced Visualizations**: Feature importance, text statistics, readability analysis
-    - **⚖️ Model Comparison**: Side-by-side performance analysis across all models
-    - **📋 Comprehensive Reports**: Download detailed PDF and Excel reports
-    """)
-    
-    # Enhanced model performance overview
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.markdown("#### 🧠 **Deep Learning Models**")
-        dl_data = {
-            'Model': ['CNN', 'LSTM', 'RNN'],
-            'Accuracy': ['97.33%', '94.52%', '82.75%'],
-            'Strengths': ['Best Performance', 'Sequential Analysis', 'Basic RNN']
-        }
-        st.dataframe(pd.DataFrame(dl_data), use_container_width=True)
+        st.markdown("""
+        <div class="feature-card">
+            <h3 class="feature-title">📝 Multiple Input Methods</h3>
+            <p class="feature-description">
+                • Type text directly<br/>
+                • Paste content<br/>
+                • Upload PDF/Word documents<br/>
+                • Batch processing support
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("#### ⚙️ **Traditional ML Models**")
-        ml_data = {
-            'Model': ['SVM', 'Decision Tree', 'AdaBoost'],
-            'Accuracy': ['96.38%', '84.99%', '85.50%'],
-            'Strengths': ['Feature-based', 'Interpretable', 'Ensemble']
-        }
-        st.dataframe(pd.DataFrame(ml_data), use_container_width=True)
+        st.markdown("""
+        <div class="feature-card">
+            <h3 class="feature-title">🤖 6 Advanced Models</h3>
+            <p class="feature-description">
+                • <strong>Deep Learning:</strong> CNN, LSTM, RNN<br/>
+                • <strong>Traditional ML:</strong> SVM, Decision Tree, AdaBoost<br/>
+                • Choose the best for your needs
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Quick start guide
+    with col3:
+        st.markdown("""
+        <div class="feature-card">
+            <h3 class="feature-title">📊 Advanced Analytics</h3>
+            <p class="feature-description">
+                • Real-time predictions<br/>
+                • Confidence scores & visualizations<br/>
+                • Feature importance analysis<br/>
+                • Comprehensive text statistics
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Model Performance Overview
     st.markdown("""
-    ### 🚀 **Quick Start Guide:**
-    1. **Text Analysis**: Paste or type text for quick analysis
-    2. **File Upload**: Upload PDF or Word documents for processing
-    3. **Model Comparison**: Compare results across all 6 models
-    4. **Advanced Analytics**: Deep dive into text statistics and features
-    5. **Download Reports**: Get comprehensive analysis reports
-    """)
+    <div class="section-header">
+        <h2 class="section-title">🏆 Model Performance Overview</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    performance_col1, performance_col2 = st.columns(2)
+    
+    with performance_col1:
+        st.markdown("#### 🧠 Deep Learning Models")
+        st.markdown("""
+        <div class="model-card">
+            <div class="model-name">🔥 CNN</div>
+            <div class="model-accuracy">97.33%</div>
+            <div class="model-description">Best overall performance with convolutional pattern recognition</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="model-card">
+            <div class="model-name">🔄 LSTM</div>
+            <div class="model-accuracy">94.52%</div>
+            <div class="model-description">Excellent for sequential analysis and context understanding</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="model-card">
+            <div class="model-name">⚡ RNN</div>
+            <div class="model-accuracy">82.75%</div>
+            <div class="model-description">Basic recurrent network for text processing</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with performance_col2:
+        st.markdown("#### ⚙️ Traditional ML Models")
+        st.markdown("""
+        <div class="model-card">
+            <div class="model-name">🎯 SVM</div>
+            <div class="model-accuracy">96.38%</div>
+            <div class="model-description">Support Vector Machine with robust feature-based classification</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="model-card">
+            <div class="model-name">🌳 Decision Tree</div>
+            <div class="model-accuracy">84.99%</div>
+            <div class="model-description">Most interpretable model with clear decision paths</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="model-card">
+            <div class="model-name">🚀 AdaBoost</div>
+            <div class="model-accuracy">85.50%</div>
+            <div class="model-description">Ensemble boosting method for improved accuracy</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Quick Start Guide
+    st.markdown("""
+    <div class="section-header">
+        <h2 class="section-title">🚀 Quick Start Guide</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="feature-card">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div style="padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+                <h4>1. 📝 Text Analysis</h4>
+                <p>Navigate to Text Analysis to analyze individual texts with detailed insights</p>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); border-radius: 10px; color: white;">
+                <h4>2. 📁 File Upload</h4>
+                <p>Upload PDF or Word documents for professional document analysis</p>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%); border-radius: 10px; color: white;">
+                <h4>3. ⚖️ Model Comparison</h4>
+                <p>Compare all 6 models side-by-side for comprehensive analysis</p>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-radius: 10px; color: white;">
+                <h4>4. 📈 Advanced Analytics</h4>
+                <p>Deep dive into text characteristics and AI detection patterns</p>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-radius: 10px; color: #2c3e50;">
+                <h4>5. 📥 Download Reports</h4>
+                <p>Get comprehensive PDF and Excel analysis reports</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # TEXT ANALYSIS PAGE (Enhanced)
 elif page == "🔮 Text Analysis":
