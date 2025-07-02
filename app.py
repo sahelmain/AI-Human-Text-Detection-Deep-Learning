@@ -47,7 +47,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced Custom CSS for Professional UI
+# Cursor-Inspired Dark Gradient CSS
 st.markdown("""
 <style>
     /* Import Google Fonts */
@@ -56,58 +56,58 @@ st.markdown("""
     /* Global Styles */
     .main {
         font-family: 'Inter', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #d946ef 50%, #f97316 75%, #84cc16 100%);
         min-height: 100vh;
     }
     
     /* Header Styling */
     .main-header {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        padding: 2rem;
-        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        padding: 3rem;
+        border-radius: 20px;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.18);
     }
     
     .main-title {
-        font-size: 3.5rem;
+        font-size: 4rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #00d4ff, #090979);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: white;
         margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
     
     .main-subtitle {
-        font-size: 1.3rem;
-        color: #e0e6ed;
-        font-weight: 300;
+        font-size: 1.4rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
         margin-bottom: 0;
     }
     
     /* Card Styling */
     .feature-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
         padding: 2rem;
         border-radius: 20px;
         margin: 1rem 0;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255,255,255,0.18);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     
     .feature-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
     }
     
     .feature-title {
         font-size: 1.5rem;
         font-weight: 600;
-        color: #2c3e50;
+        color: white;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
@@ -116,42 +116,47 @@ st.markdown("""
     
     .feature-description {
         font-size: 1rem;
-        color: #5a6c7d;
+        color: rgba(255, 255, 255, 0.8);
         line-height: 1.6;
     }
     
     /* Model Cards */
     .model-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(20px);
         color: white;
         padding: 1.5rem;
-        border-radius: 15px;
+        border-radius: 16px;
         margin: 0.5rem 0;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
     }
     
     .model-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+        background: rgba(0, 0, 0, 0.3);
     }
     
     .model-name {
         font-size: 1.3rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
+        color: white;
     }
     
     .model-accuracy {
         font-size: 2rem;
         font-weight: 700;
-        color: #00ff88;
+        color: #10b981;
         margin: 0.5rem 0;
+        text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
     }
     
     .model-description {
         font-size: 0.95rem;
-        opacity: 0.9;
+        color: rgba(255, 255, 255, 0.7);
         line-height: 1.4;
     }
     
@@ -163,32 +168,28 @@ st.markdown("""
         text-align: center;
         font-size: 1.8rem;
         font-weight: 600;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-        backdrop-filter: blur(10px);
-        border: 2px solid transparent;
-        animation: glow 2s ease-in-out infinite alternate;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        backdrop-filter: blur(20px);
+        border: 2px solid;
     }
     
     .ai-prediction {
-        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-        color: white;
-        border-color: #ff6b6b;
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border-color: #ef4444;
+        text-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
     }
     
     .human-prediction {
-        background: linear-gradient(135deg, #00d2d3, #54a0ff);
-        color: white;
-        border-color: #00d2d3;
-    }
-    
-    @keyframes glow {
-        from { box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
-        to { box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
+        background: rgba(59, 130, 246, 0.15);
+        color: #93c5fd;
+        border-color: #3b82f6;
+        text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
     }
     
     /* Buttons */
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
         color: white;
         border: none;
         border-radius: 12px;
@@ -196,19 +197,22 @@ st.markdown("""
         font-weight: 600;
         font-size: 1rem;
         transition: all 0.3s ease;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        backdrop-filter: blur(10px);
     }
     
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
+        background: linear-gradient(135deg, #8b5cf6, #6366f1);
     }
     
     /* Sidebar */
     .sidebar .sidebar-content {
-        background: linear-gradient(180deg, #2c3e50, #34495e);
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(20px);
         border-radius: 0 20px 20px 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     /* Navigation */
@@ -216,94 +220,104 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(20px);
+        color: white;
     }
     
     /* Metrics */
     [data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
         padding: 1.5rem;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         border: 1px solid rgba(255,255,255,0.18);
-        backdrop-filter: blur(10px);
+        color: white;
     }
     
     /* Text Areas */
     .stTextArea > div > div > textarea {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        border: 2px solid #e1e8ed;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
         padding: 1rem;
         font-size: 1rem;
         transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        color: white;
     }
     
     .stTextArea > div > div > textarea:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        border-color: #8b5cf6;
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
     }
     
     /* File Uploader */
     [data-testid="stFileUploader"] {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
         border-radius: 20px;
         padding: 2rem;
-        border: 2px dashed #667eea;
+        border: 2px dashed rgba(255, 255, 255, 0.3);
         text-align: center;
-        backdrop-filter: blur(10px);
         transition: all 0.3s ease;
+        color: white;
     }
     
     [data-testid="stFileUploader"]:hover {
-        border-color: #764ba2;
-        background: rgba(255, 255, 255, 1);
+        border-color: #8b5cf6;
+        background: rgba(255, 255, 255, 0.15);
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 35px rgba(0,0,0,0.2);
     }
     
     /* Progress Bar */
     .stProgress > div > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         border-radius: 10px;
     }
     
     /* Tables */
     .stDataFrame {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: white;
     }
     
     /* Sections */
     .section-header {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
         padding: 1.5rem;
-        border-radius: 15px;
+        border-radius: 20px;
         margin: 2rem 0 1rem 0;
         text-align: center;
-        box-shadow: 0 8px 25px rgba(255, 154, 158, 0.3);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255, 255, 255, 0.18);
     }
     
     .section-title {
         font-size: 1.8rem;
         font-weight: 600;
-        color: #2c3e50;
+        color: white;
         margin: 0;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
     
     /* Download Section */
     .download-section {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
         padding: 2rem;
         border-radius: 20px;
         margin: 2rem 0;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         border: 1px solid rgba(255,255,255,0.18);
+        color: white;
     }
     
     /* Status Indicators */
@@ -313,18 +327,21 @@ st.markdown("""
         gap: 0.5rem;
         padding: 0.5rem 1rem;
         border-radius: 25px;
-        font-weight: 600;
+        font-weight: 500;
         font-size: 0.9rem;
+        backdrop-filter: blur(10px);
     }
     
     .status-available {
-        background: linear-gradient(135deg, #00d2d3, #54a0ff);
-        color: white;
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.3);
     }
     
     .status-unavailable {
-        background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-        color: white;
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
     }
     
     /* Animation for loading */
@@ -706,43 +723,88 @@ if models is None:
 
 # Enhanced Model Status in Sidebar
 st.sidebar.markdown("""
-<div style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-radius: 15px; margin: 1rem 0;">
-    <h3 style="color: #2c3e50; margin: 0; font-weight: 600;">🤖 Available Models</h3>
+<div style="
+    text-align: center; 
+    padding: 1.5rem; 
+    background: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(20px);
+    border-radius: 20px; 
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+">
+    <h3 style="color: white; margin: 0; font-weight: 600; font-size: 1.2rem;">🤖 Available Models</h3>
 </div>
 """, unsafe_allow_html=True)
 
 available_models = [k for k in models.keys() if k not in ['vectorizer', 'vocab_to_idx', 'model_configs']]
 
-# Model accuracy mapping
-model_accuracies = {
-    'svm': '96.38%',
-    'decision_tree': '84.99%', 
-    'adaboost': '85.50%',
-    'cnn': '97.33%',
-    'lstm': '94.52%',
-    'rnn': '82.75%'
+# Enhanced model accuracy mapping with icons and categories
+model_info = {
+    'svm': {'accuracy': '96.38%', 'icon': '🎯', 'category': 'ML', 'color': '#8b5cf6'},
+    'decision_tree': {'accuracy': '84.99%', 'icon': '🌳', 'category': 'ML', 'color': '#06d6a0'}, 
+    'adaboost': {'accuracy': '85.50%', 'icon': '🚀', 'category': 'ML', 'color': '#f72585'},
+    'cnn': {'accuracy': '97.33%', 'icon': '🔥', 'category': 'DL', 'color': '#ffd60a'},
+    'lstm': {'accuracy': '94.52%', 'icon': '🔄', 'category': 'DL', 'color': '#003566'},
+    'rnn': {'accuracy': '82.75%', 'icon': '⚡', 'category': 'DL', 'color': '#0077b6'}
 }
 
 for model in available_models:
-    accuracy = model_accuracies.get(model, 'N/A')
-    model_display = model.replace('_', ' ').title()
+    info = model_info.get(model, {'accuracy': 'N/A', 'icon': '🤖', 'category': 'Other', 'color': '#6c757d'})
+    model_display = model.replace('_', ' ').upper()
     
     st.sidebar.markdown(f"""
     <div style="
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        margin: 0.25rem 0;
-        border-radius: 25px;
-        background: linear-gradient(135deg, #00d2d3, #54a0ff);
-        color: white;
-        font-weight: 600;
-        font-size: 0.9rem;
-        width: 100%;
-        box-sizing: border-box;
-    ">
-        ✅ {model_display} ({accuracy})
+        position: relative;
+        margin: 0.75rem 0;
+        padding: 1rem 1.25rem;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    "
+    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)';"
+    onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.1)';"
+    >
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="
+                    width: 32px; 
+                    height: 32px; 
+                    background: linear-gradient(135deg, {info['color']}40, {info['color']}20);
+                    border-radius: 8px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    font-size: 16px;
+                    border: 1px solid {info['color']}60;
+                ">
+                    {info['icon']}
+                </div>
+                <div>
+                    <div style="color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px;">
+                        {model_display}
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; font-weight: 400;">
+                        {info['category']} Model
+                    </div>
+                </div>
+            </div>
+            <div style="
+                background: linear-gradient(135deg, {info['color']}, {info['color']}80);
+                color: white;
+                padding: 0.4rem 0.8rem;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 0.85rem;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+                box-shadow: 0 2px 8px {info['color']}30;
+            ">
+                {info['accuracy']}
+            </div>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
