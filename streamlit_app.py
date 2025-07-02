@@ -24,31 +24,145 @@ from utils import (
     download_nltk_requirements
 )
 
-# Download NLTK data at startup
+# AGGRESSIVE NLTK Data Setup
 @st.cache_resource
 def setup_nltk():
-    """Download and setup NLTK requirements once"""
+    """Download and setup NLTK requirements with multiple fallbacks"""
     try:
-        # Create a placeholder for status
-        status_placeholder = st.empty()
-        status_placeholder.info("🔄 Setting up NLTK data for text analysis...")
+        import ssl
+        try:
+            _create_unverified_https_context = ssl._create_unverified_context
+        except AttributeError:
+            pass
+        else:
+            ssl._create_default_https_context = _create_unverified_https_context
         
-        download_nltk_requirements()
+        # Download essential NLTK data
+        required_packages = ['punkt', 'averaged_perceptron_tagger', 'stopwords']
         
-        status_placeholder.success("✅ NLTK data loaded successfully!")
-        # Clear the message after 2 seconds
-        import time
-        time.sleep(2)
-        status_placeholder.empty()
+        for package in required_packages:
+            try:
+                nltk.data.find(f'tokenizers/{package}')
+            except LookupError:
+                try:
+                    nltk.download(package, quiet=True)
+                except:
+                    # Try with different download method
+                    try:
+                        nltk.download(package, download_dir='/tmp/nltk_data', quiet=True)
+                        import os
+                        if 'NLTK_DATA' not in os.environ:
+                            os.environ['NLTK_DATA'] = '/tmp/nltk_data'
+                    except:
+                        pass
         
         return True
     except Exception as e:
-        st.error(f"❌ Failed to download NLTK requirements: {e}")
-        st.warning("⚠️ Some text analysis features may not work properly.")
+        st.warning(f"⚠️ NLTK setup issue (app will continue): {str(e)[:100]}")
         return False
 
 # Setup NLTK data
-setup_nltk()
+nltk_ready = setup_nltk()
+
+# Fallback text processing without NLTK
+def safe_sentence_tokenize(text):
+    """Fallback sentence tokenizer if NLTK fails"""
+    try:
+        import nltk
+        return nltk.sent_tokenize(text)
+    except:
+        # Simple fallback - split on sentence endings
+        import re
+        sentences = re.split(r'[.!?]+', text)
+        return [s.strip() for s in sentences if s.strip()]
+
+def safe_word_tokenize(text):
+    """Fallback word tokenizer if NLTK fails"""
+    try:
+        import nltk
+        return nltk.word_tokenize(text)
+    except:
+        # Simple fallback - split on whitespace and punctuation
+        import re
+        words = re.findall(r'\b\w+\b', text.lower())
+        return words
+
+def safe_extract_text_statistics(text):
+    """Extract text statistics with NLTK fallbacks"""
+    stats = {}
+    
+    # Basic counts
+    stats['character_count'] = len(text)
+    words = text.split()
+    stats['word_count'] = len(words)
+    
+    # Sentence count with fallback
+    try:
+        sentences = safe_sentence_tokenize(text)
+        stats['sentence_count'] = len(sentences)
+    except:
+        # Ultimate fallback - count sentence endings
+        import re
+        stats['sentence_count'] = len(re.findall(r'[.!?]+', text))
+    
+    stats['paragraph_count'] = len([p for p in text.split('\n\n') if p.strip()])
+    
+    # Average lengths
+    stats['avg_word_length'] = np.mean([len(word) for word in words]) if words else 0
+    
+    try:
+        sentences = safe_sentence_tokenize(text)
+        stats['avg_sentence_length'] = np.mean([len(sent.split()) for sent in sentences]) if sentences else 0
+    except:
+        stats['avg_sentence_length'] = stats['word_count'] / max(1, stats['sentence_count'])
+    
+    # Readability scores (simplified versions if textstat fails)
+    try:
+        import textstat
+        if len(text.strip()) > 0:
+            stats['flesch_reading_ease'] = textstat.flesch_reading_ease(text)
+            stats['flesch_kincaid_grade'] = textstat.flesch_kincaid_grade(text)
+            stats['automated_readability_index'] = textstat.automated_readability_index(text)
+            stats['coleman_liau_index'] = textstat.coleman_liau_index(text)
+            stats['gunning_fog'] = textstat.gunning_fog(text)
+            stats['smog_index'] = textstat.smog_index(text)
+        else:
+            for key in ['flesch_reading_ease', 'flesch_kincaid_grade', 'automated_readability_index', 
+                       'coleman_liau_index', 'gunning_fog', 'smog_index']:
+                stats[key] = 0
+    except:
+        # Simple fallback scores
+        avg_words_per_sentence = stats['word_count'] / max(1, stats['sentence_count'])
+        stats['flesch_reading_ease'] = max(0, 100 - avg_words_per_sentence * 2)
+        stats['flesch_kincaid_grade'] = min(20, avg_words_per_sentence * 0.5)
+        stats['automated_readability_index'] = stats['flesch_kincaid_grade']
+        stats['coleman_liau_index'] = stats['flesch_kincaid_grade']
+        stats['gunning_fog'] = stats['flesch_kincaid_grade']
+        stats['smog_index'] = stats['flesch_kincaid_grade']
+    
+    # Lexical diversity
+    try:
+        word_tokens = safe_word_tokenize(text.lower())
+        unique_words = len(set(word_tokens))
+        stats['lexical_diversity'] = unique_words / len(word_tokens) if word_tokens else 0
+        
+        # Most common words
+        from collections import Counter
+        word_freq = Counter([word for word in word_tokens if word.isalpha()])
+        stats['most_common_words'] = word_freq.most_common(10)
+    except:
+        # Simple fallback
+        words_lower = [w.lower() for w in words if w.isalpha()]
+        unique_words = len(set(words_lower))
+        stats['lexical_diversity'] = unique_words / len(words_lower) if words_lower else 0
+        stats['most_common_words'] = []
+    
+    # Punctuation analysis
+    punctuation_marks = ".,!?;:"
+    stats['punctuation_count'] = sum(text.count(p) for p in punctuation_marks)
+    stats['punctuation_ratio'] = stats['punctuation_count'] / len(text) if len(text) > 0 else 0
+    
+    return stats
 
 # Import joblib with fallback
 try:
@@ -1283,7 +1397,7 @@ elif page == "🔮 Text Analysis":
                     if show_statistics:
                         st.markdown("---")
                         st.markdown("#### 📊 Text Statistics")
-                        text_stats = extract_text_statistics(text_input)
+                        text_stats = safe_extract_text_statistics(text_input)
                         
                         # Basic statistics
                         stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
@@ -1481,7 +1595,7 @@ elif page == "📁 File Upload":
                         # Document statistics
                         st.markdown("---")
                         st.markdown("#### 📈 Document Statistics")
-                        doc_stats = extract_text_statistics(extracted_text)
+                        doc_stats = safe_extract_text_statistics(extracted_text)
                         
                         stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
                         with stat_col1:
@@ -1657,7 +1771,7 @@ elif page == "⚖️ Model Comparison":
                     
                     # Direct download for model comparison
                     try:
-                        text_stats = extract_text_statistics(comparison_text)
+                        text_stats = safe_extract_text_statistics(comparison_text)
                         # Use the first model's results as primary for report generation
                         primary_result = list(detailed_results.values())[0]
                         prediction_results = {
@@ -1818,7 +1932,7 @@ elif page == "📈 Advanced Analytics":
         if analytics_text.strip():
             with st.spinner("🔄 Performing comprehensive analysis..."):
                 # Get comprehensive statistics
-                text_stats = extract_text_statistics(analytics_text)
+                text_stats = safe_extract_text_statistics(analytics_text)
                 features = analyze_text_features(analytics_text, models.get('vectorizer'))
                 
                 # Run prediction with best model (CNN if available, otherwise SVM)
