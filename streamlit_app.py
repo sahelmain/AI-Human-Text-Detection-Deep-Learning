@@ -47,14 +47,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Streamlit Cloud Compatible CSS
+# Streamlit Cloud Force Styling
 st.markdown("""
 <style>
-    /* Global Styles - Using system fonts for better compatibility */
-    .main {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #d946ef 50%, #f97316 75%, #84cc16 100%);
-        min-height: 100vh;
+    /* Force global background on all Streamlit containers */
+    .stApp, .main, .block-container, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #d946ef 50%, #f97316 75%, #84cc16 100%) !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        min-height: 100vh !important;
+    }
+    
+    /* Force remove Streamlit's default background */
+    .stApp > div > div > div > div {
+        background: transparent !important;
     }
     
     /* Header Styling */
@@ -199,16 +204,21 @@ st.markdown("""
         background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
     }
     
-    /* Sidebar */
-    .css-1d391kg {
+    /* Force all Streamlit containers to be transparent or gradient */
+    [data-testid="stSidebar"], .css-1d391kg, .sidebar, .st-emotion-cache-16idsys {
         background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)) !important;
     }
     
-    /* Navigation */
-    .stSelectbox > div > div {
+    /* Navigation and selectbox styling */
+    .stSelectbox > div > div, .st-emotion-cache-1y4p8pa {
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
         border-radius: 12px !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+    }
+    
+    /* Force all text to be white for visibility */
+    .stMarkdown, .stText, h1, h2, h3, h4, h5, h6, p, div, span, label {
         color: white !important;
     }
     
@@ -353,20 +363,41 @@ st.markdown("""
         }
     }
     
-    /* Force white text for better visibility */
-    .stMarkdown, .stText {
-        color: white !important;
-    }
-    
-    /* Override Streamlit's default styles */
-    .stApp {
+    /* Force all content areas to inherit gradient background */
+    [data-testid="stVerticalBlock"], [data-testid="stHorizontalBlock"], .st-emotion-cache-1kyxreq {
         background: transparent !important;
     }
     
-    /* Hide Streamlit branding */
+    /* Ensure metrics and widgets have proper styling */
+    [data-testid="metric-container"] > div {
+        color: white !important;
+    }
+    
+    /* Force column backgrounds to be transparent */
+    [data-testid="column"] {
+        background: transparent !important;
+    }
+    
+    /* Override all default Streamlit backgrounds */
+    .stApp, .main, .block-container {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #d946ef 50%, #f97316 75%, #84cc16 100%) !important;
+    }
+    
+    /* Hide Streamlit branding and improve UX */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
+    .stDeployButton {visibility: hidden;}
+    
+    /* Additional text color forcing */
+    * {
+        color: white;
+    }
+    
+    /* Ensure custom HTML elements maintain styling */
+    .main-header, .feature-card, .model-card, .prediction-result {
+        color: white !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -690,16 +721,42 @@ def get_download_link(file_bytes, file_name, file_type):
 # Main App
 # Main Header with Enhanced Styling
 st.markdown("""
-<div class="main-header">
-    <h1 class="main-title">🤖 AI vs Human Text Detection</h1>
-    <p class="main-subtitle">Advanced Machine Learning & Deep Learning Classification System</p>
+<div class="main-header" style="
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    padding: 3rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+">
+    <h1 style="
+        font-size: 4rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    ">🤖 AI vs Human Text Detection</h1>
+    <p style="
+        font-size: 1.4rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+        margin-bottom: 0;
+    ">Advanced Machine Learning & Deep Learning Classification System</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Enhanced Sidebar Navigation
 st.sidebar.markdown("""
-<div style="text-align: center; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; margin-bottom: 1rem;">
-    <h2 style="color: white; margin: 0; font-weight: 600;">🧭 Navigation</h2>
+<div style="
+    text-align: center; 
+    padding: 1.5rem; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    border-radius: 15px; 
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+">
+    <h2 style="color: white; margin: 0; font-weight: 600; font-size: 1.3rem;">🧭 Navigation</h2>
 </div>
 """, unsafe_allow_html=True)
 
@@ -808,9 +865,25 @@ for model in available_models:
 if page == "🏠 Home":
     # Welcome Section
     st.markdown("""
-    <div class="feature-card">
-        <h2 class="feature-title">🎯 Welcome to the Complete AI vs Human Text Detection System</h2>
-        <p class="feature-description">
+    <div style="
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 1rem 0;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    ">
+        <h2 style="
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1rem;
+        ">🎯 Welcome to the Complete AI vs Human Text Detection System</h2>
+        <p style="
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        ">
             This comprehensive application uses both traditional machine learning and cutting-edge deep learning to 
             distinguish between AI-generated and human-written text with <strong>up to 97.33% accuracy</strong>.
             Built with 6 advanced models and professional-grade analytics.
