@@ -449,23 +449,103 @@ st.markdown("""
         color: white !important;
     }
     
-    /* OVERRIDE: Force dropdown text to be dark - must come AFTER global white text rule */
-    .stSelectbox * {
+    /* AGGRESSIVE DROPDOWN TEXT OVERRIDE - Maximum specificity */
+    body .stSelectbox * {
         color: #2c3e50 !important;
     }
     
-    .stSelectbox [role="option"], 
-    .stSelectbox [role="listbox"], 
-    .stSelectbox [role="listbox"] *,
-    .stSelectbox ul li,
-    .stSelectbox div[data-baseweb="select"] *,
-    .stSelectbox [data-baseweb="menu"] *,
-    [data-testid="stSelectbox"] * {
+    body .main .stSelectbox [role="option"], 
+    body .main .stSelectbox [role="listbox"], 
+    body .main .stSelectbox [role="listbox"] *,
+    body .main .stSelectbox ul li,
+    body .main .stSelectbox div[data-baseweb="select"] *,
+    body .main .stSelectbox [data-baseweb="menu"] *,
+    body .main [data-testid="stSelectbox"] *,
+    body .stApp .stSelectbox * {
+        color: #2c3e50 !important;
+        background-color: white !important;
+    }
+    
+    /* Force any element inside selectbox containers */
+    .stSelectbox, .stSelectbox * {
+        color: #2c3e50 !important;
+    }
+    
+    /* Target specific Streamlit classes */
+    [class*="selectbox"] [class*="option"],
+    [class*="selectbox"] [class*="menu"],
+    [class*="selectbox"] li,
+    [class*="selectbox"] div {
         color: #2c3e50 !important;
         background-color: white !important;
     }
 </style>
 """, unsafe_allow_html=True)
+
+# JavaScript to force dropdown text colors
+st.components.v1.html("""
+<script>
+function fixDropdownColors() {
+    // Wait for elements to be available
+    setTimeout(() => {
+        // Target all dropdown elements with multiple selectors
+        const selectors = [
+            '.stSelectbox [role="option"]',
+            '.stSelectbox [role="listbox"] *',
+            '.stSelectbox ul li',
+            '.stSelectbox div',
+            '[data-testid="stSelectbox"] *',
+            '[class*="select"] [role="option"]',
+            '[aria-expanded="true"] + div div',
+            '[data-baseweb="select"] [role="option"]'
+        ];
+        
+        selectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                if (el && el.style) {
+                    el.style.setProperty('color', '#2c3e50', 'important');
+                    el.style.setProperty('background-color', 'white', 'important');
+                }
+            });
+        });
+        
+        // Also target any new elements
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.addedNodes) {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) {
+                            if (node.closest && node.closest('.stSelectbox')) {
+                                node.style.setProperty('color', '#2c3e50', 'important');
+                                node.style.setProperty('background-color', 'white', 'important');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }, 500);
+}
+
+// Run multiple times to catch dynamic elements
+fixDropdownColors();
+setTimeout(fixDropdownColors, 1000);
+setTimeout(fixDropdownColors, 2000);
+setInterval(fixDropdownColors, 3000);
+
+// Listen for clicks on selectbox to fix immediately
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.stSelectbox')) {
+        setTimeout(fixDropdownColors, 100);
+    }
+});
+</script>
+""", height=0)
 
 # Deep Learning Model Classes (same as before)
 class CNNTextClassifier(nn.Module):
