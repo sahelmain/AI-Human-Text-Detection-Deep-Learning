@@ -629,40 +629,46 @@ elif page == "🔮 Text Analysis":
                         download_col1, download_col2 = st.columns(2)
                         
                         with download_col1:
-                            if st.button("📄 Generate PDF Report", use_container_width=True):
-                                with st.spinner("Generating PDF report..."):
-                                    prediction_results = {
-                                        'prediction': prediction,
-                                        'probabilities': probabilities,
-                                        'confidence': confidence
-                                    }
-                                    pdf_bytes = generate_analysis_report(text_input, prediction_results, text_stats)
-                                    
-                                    st.download_button(
-                                        label="📥 Download PDF Report",
-                                        data=pdf_bytes,
-                                        file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                        mime="application/pdf",
-                                        use_container_width=True
-                                    )
+                            # Direct PDF download - single step
+                            try:
+                                prediction_results = {
+                                    'prediction': prediction,
+                                    'probabilities': probabilities,
+                                    'confidence': confidence
+                                }
+                                pdf_bytes = generate_analysis_report(text_input, prediction_results, text_stats)
+                                
+                                st.download_button(
+                                    label="📄 Download PDF Report",
+                                    data=pdf_bytes,
+                                    file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                                    mime="application/pdf",
+                                    use_container_width=True,
+                                    help="Click to download comprehensive PDF analysis report"
+                                )
+                            except Exception as e:
+                                st.error(f"Error generating PDF report: {str(e)}")
                         
                         with download_col2:
-                            if st.button("📊 Generate Excel Report", use_container_width=True):
-                                with st.spinner("Generating Excel report..."):
-                                    prediction_results = {
-                                        'prediction': prediction,
-                                        'probabilities': probabilities,
-                                        'confidence': confidence
-                                    }
-                                    excel_bytes = create_downloadable_excel_report(text_input, prediction_results, text_stats)
-                                    
-                                    st.download_button(
-                                        label="📥 Download Excel Report",
-                                        data=excel_bytes,
-                                        file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                        use_container_width=True
-                                    )
+                            # Direct Excel download - single step
+                            try:
+                                prediction_results = {
+                                    'prediction': prediction,
+                                    'probabilities': probabilities,
+                                    'confidence': confidence
+                                }
+                                excel_bytes = create_downloadable_excel_report(text_input, prediction_results, text_stats)
+                                
+                                st.download_button(
+                                    label="📊 Download Excel Report",
+                                    data=excel_bytes,
+                                    file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    use_container_width=True,
+                                    help="Click to download detailed Excel analysis report"
+                                )
+                            except Exception as e:
+                                st.error(f"Error generating Excel report: {str(e)}")
                         
                         st.markdown('</div>', unsafe_allow_html=True)
         else:
@@ -789,24 +795,34 @@ elif page == "📁 File Upload":
                         report_col1, report_col2 = st.columns(2)
                         
                         with report_col1:
-                            if st.button("📄 Download PDF Report", key="file_pdf", use_container_width=True):
+                            # Direct PDF download for file analysis
+                            try:
                                 pdf_bytes = generate_analysis_report(extracted_text, prediction_results, doc_stats)
                                 st.download_button(
-                                    label="📥 Download PDF",
+                                    label="📄 Download PDF Report",
                                     data=pdf_bytes,
                                     file_name=f"document_analysis_{uploaded_file.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                    mime="application/pdf"
+                                    mime="application/pdf",
+                                    use_container_width=True,
+                                    help="Download comprehensive PDF analysis of the document"
                                 )
+                            except Exception as e:
+                                st.error(f"Error generating PDF report: {str(e)}")
                         
                         with report_col2:
-                            if st.button("📊 Download Excel Report", key="file_excel", use_container_width=True):
+                            # Direct Excel download for file analysis
+                            try:
                                 excel_bytes = create_downloadable_excel_report(extracted_text, prediction_results, doc_stats)
                                 st.download_button(
-                                    label="📥 Download Excel",
+                                    label="📊 Download Excel Report",
                                     data=excel_bytes,
                                     file_name=f"document_analysis_{uploaded_file.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    use_container_width=True,
+                                    help="Download detailed Excel analysis of the document"
                                 )
+                            except Exception as e:
+                                st.error(f"Error generating Excel report: {str(e)}")
         else:
             st.error("❌ Failed to extract text from the document. Please check the file format and try again.")
 
@@ -928,7 +944,8 @@ elif page == "⚖️ Model Comparison":
                     st.markdown("---")
                     st.markdown("#### 📥 Download Comparison Report")
                     
-                    if st.button("📊 Generate Comparison Report", use_container_width=True):
+                    # Direct download for model comparison
+                    try:
                         text_stats = extract_text_statistics(comparison_text)
                         # Use the first model's results as primary for report generation
                         primary_result = list(detailed_results.values())[0]
@@ -940,11 +957,15 @@ elif page == "⚖️ Model Comparison":
                         
                         excel_bytes = create_downloadable_excel_report(comparison_text, prediction_results, text_stats, results)
                         st.download_button(
-                            label="📥 Download Excel Report",
+                            label="📊 Download Comparison Report",
                             data=excel_bytes,
                             file_name=f"model_comparison_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            use_container_width=True,
+                            help="Download comprehensive comparison report of all models"
                         )
+                    except Exception as e:
+                        st.error(f"Error generating comparison report: {str(e)}")
                 else:
                     st.error("❌ No models were able to make predictions")
         else:
