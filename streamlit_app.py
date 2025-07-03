@@ -1,4 +1,13 @@
 import streamlit as st
+
+# Page Configuration - MUST be first Streamlit command
+st.set_page_config(
+    page_title="AI vs Human Text Detection",
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -20,14 +29,13 @@ import nltk
 from utils import (
     extract_text_from_pdf, extract_text_from_docx, 
     extract_text_statistics, analyze_text_features,
-    generate_analysis_report, create_downloadable_excel_report,
-    download_nltk_requirements
+    generate_analysis_report, create_downloadable_excel_report
 )
 
-# AGGRESSIVE NLTK Data Setup
+# AGGRESSIVE NLTK Data Setup for Hugging Face Spaces
 @st.cache_resource
 def setup_nltk():
-    """Download and setup NLTK requirements with multiple fallbacks"""
+    """Download and setup NLTK requirements with multiple fallbacks for cloud deployment"""
     try:
         import ssl
         try:
@@ -37,24 +45,43 @@ def setup_nltk():
         else:
             ssl._create_default_https_context = _create_unverified_https_context
         
-        # Download essential NLTK data
-        required_packages = ['punkt', 'averaged_perceptron_tagger', 'stopwords']
+        # Set up NLTK data path for cloud environments
+        import os
+        nltk_data_paths = [
+            '/home/user/nltk_data',
+            '/tmp/nltk_data', 
+            os.path.expanduser('~/nltk_data'),
+            './nltk_data'
+        ]
+        
+        for path in nltk_data_paths:
+            if not os.path.exists(path):
+                try:
+                    os.makedirs(path, exist_ok=True)
+                except:
+                    continue
+            try:
+                nltk.data.path.insert(0, path)
+            except:
+                pass
+        
+        # Download essential NLTK data with better error handling
+        required_packages = ['punkt', 'averaged_perceptron_tagger', 'stopwords', 'wordnet']
         
         for package in required_packages:
             try:
+                # Check if already exists
                 nltk.data.find(f'tokenizers/{package}')
             except LookupError:
-                try:
-                    nltk.download(package, quiet=True)
-                except:
-                    # Try with different download method
+                for download_dir in [None] + nltk_data_paths:
                     try:
-                        nltk.download(package, download_dir='/tmp/nltk_data', quiet=True)
-                        import os
-                        if 'NLTK_DATA' not in os.environ:
-                            os.environ['NLTK_DATA'] = '/tmp/nltk_data'
+                        if download_dir:
+                            nltk.download(package, download_dir=download_dir, quiet=True)
+                        else:
+                            nltk.download(package, quiet=True)
+                        break
                     except:
-                        pass
+                        continue
         
         return True
     except Exception as e:
@@ -62,7 +89,10 @@ def setup_nltk():
         return False
 
 # Setup NLTK data
-nltk_ready = setup_nltk()
+try:
+    nltk_ready = setup_nltk()
+except Exception:
+    nltk_ready = False
 
 # Fallback text processing without NLTK
 def safe_sentence_tokenize(text):
@@ -170,24 +200,20 @@ try:
 except ImportError:
     from sklearn.externals import joblib
 
-# Try to import PyTorch for deep learning models
+# Try to import PyTorch for deep learning models with better error handling
+TORCH_AVAILABLE = False
 try:
     import torch
     import torch.nn as nn
+    # Test if torch is working properly
+    test_tensor = torch.tensor([1.0])
     TORCH_AVAILABLE = True
-except ImportError:
+except (ImportError, RuntimeError, OSError) as e:
+    st.warning(f"PyTorch not available or having issues: {e}. Deep learning models will be disabled.")
     TORCH_AVAILABLE = False
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
-
-# Page Configuration
-st.set_page_config(
-    page_title="AI vs Human Text Detection",
-    page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Streamlit Cloud Force Styling
 st.markdown("""
@@ -344,6 +370,119 @@ st.markdown("""
         transform: translateY(-3px) !important;
         box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5) !important;
         background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+        color: white !important;
+    }
+    
+    /* Download Buttons - Special styling */
+    .stDownloadButton > button {
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    .stDownloadButton > button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 40px rgba(16, 185, 129, 0.5) !important;
+        background: linear-gradient(135deg, #059669, #047857) !important;
+        color: white !important;
+    }
+    
+    /* Force download button text to be white - more specific selectors */
+    .stDownloadButton button {
+        color: white !important;
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+    }
+    
+    .stDownloadButton button p {
+        color: white !important;
+    }
+    
+    .stDownloadButton button span {
+        color: white !important;
+    }
+    
+    .stDownloadButton button div {
+        color: white !important;
+    }
+    
+    /* Ensure button text is always white */
+    .stButton > button *, .stDownloadButton > button * {
+        color: white !important;
+    }
+    
+    /* Force button text visibility - comprehensive */
+    button[kind="primary"], button[kind="secondary"] {
+        color: white !important;
+    }
+    
+    button[kind="primary"] * {
+        color: white !important;
+    }
+    
+    button[kind="secondary"] * {
+        color: white !important;
+    }
+    
+    /* All button variants */
+    [data-testid="stButton"] button {
+        color: white !important;
+    }
+    
+    [data-testid="stDownloadButton"] button {
+        color: white !important;
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+    }
+    
+    /* Ultra-specific download button text forcing */
+    [data-testid="stDownloadButton"] button * {
+        color: white !important;
+    }
+    
+    [data-testid="stDownloadButton"] p {
+        color: white !important;
+    }
+    
+    [data-testid="stDownloadButton"] span {
+        color: white !important;
+    }
+    
+    [data-testid="stDownloadButton"] div {
+        color: white !important;
+    }
+    
+    /* Alternative download button styling with darker background for better contrast */
+    div[data-testid="stDownloadButton"] button {
+        background: #047857 !important;
+        color: white !important;
+        border: 2px solid #065f46 !important;
+    }
+    
+    div[data-testid="stDownloadButton"] button:hover {
+        background: #065f46 !important;
+        color: white !important;
+    }
+    
+    /* Force text color on all download button children */
+    div[data-testid="stDownloadButton"] * {
+        color: white !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    }
+    
+    /* Button spans and text content */
+    .stButton button span, .stDownloadButton button span {
+        color: white !important;
+    }
+    
+    /* Primary button specific */
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+        color: white !important;
     }
     
     /* Force all Streamlit containers to be transparent or gradient */
@@ -353,10 +492,92 @@ st.markdown("""
     
     /* Navigation and selectbox styling */
     .stSelectbox > div > div, .st-emotion-cache-1y4p8pa {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
         border-radius: 12px !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        color: #2c3e50 !important;
+    }
+    
+    /* Selectbox dropdown options */
+    .stSelectbox option {
+        color: #2c3e50 !important;
+        background: white !important;
+    }
+    
+    /* Select dropdown menu */
+    .stSelectbox select {
+        color: #2c3e50 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Dropdown list container */
+    .stSelectbox > div > div > div {
+        background: white !important;
+        color: #2c3e50 !important;
+    }
+    
+    /* Dropdown items */
+    .stSelectbox li {
+        color: #2c3e50 !important;
+        background: white !important;
+    }
+    
+    .stSelectbox li:hover {
+        color: #2c3e50 !important;
+        background: #f8f9fa !important;
+    }
+    
+    /* Select box text and value */
+    .stSelectbox div[data-baseweb="select"] {
+        color: #2c3e50 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Select box dropdown arrow and container */
+    .stSelectbox [data-baseweb="select"] > div {
+        color: #2c3e50 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    /* Ultra-specific dropdown menu fixes */
+    [data-baseweb="select"] {
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    [data-baseweb="select"] * {
+        color: #2c3e50 !important;
+    }
+    
+    /* Dropdown menu popup */
+    [data-baseweb="popover"] {
+        background: white !important;
+    }
+    
+    [data-baseweb="popover"] * {
+        color: #2c3e50 !important;
+        background: white !important;
+    }
+    
+    /* Menu items in dropdown */
+    [role="option"] {
+        color: #2c3e50 !important;
+        background: white !important;
+    }
+    
+    [role="option"]:hover {
+        color: #2c3e50 !important;
+        background: #e9ecef !important;
+    }
+    
+    /* Listbox container */
+    [role="listbox"] {
+        background: white !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px !important;
+    }
+    
+    [role="listbox"] * {
+        color: #2c3e50 !important;
     }
     
     /* Comprehensive dropdown text fixes */
@@ -426,18 +647,118 @@ st.markdown("""
     
     /* Text Areas */
     .stTextArea > div > div > textarea {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
         border-radius: 16px !important;
-        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
         padding: 1rem !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
-        color: white !important;
+        color: #2c3e50 !important;
     }
     
     .stTextArea > div > div > textarea:focus {
         border-color: #8b5cf6 !important;
         box-shadow: 0 0 25px rgba(139, 92, 246, 0.4) !important;
+        background: rgba(255, 255, 255, 1) !important;
+    }
+    
+    .stTextArea > div > div > textarea::placeholder {
+        color: #7f8c8d !important;
+    }
+    
+    /* Disabled text areas (for preview) */
+    .stTextArea > div > div > textarea[disabled] {
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #34495e !important;
+        border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    }
+    
+    /* Text Input Fields */
+    .stTextInput > div > div > input {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #2c3e50 !important;
+        border-radius: 12px !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        background: rgba(255, 255, 255, 1) !important;
+        border-color: #8b5cf6 !important;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3) !important;
+    }
+    
+    /* Number Input Fields */
+    .stNumberInput > div > div > input {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #2c3e50 !important;
+        border-radius: 12px !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    /* General text visibility */
+    .stMarkdown p, .stMarkdown div, .stText {
+        color: white !important;
+    }
+    
+    /* Override Streamlit default text colors */
+    [data-testid="stMarkdownContainer"] p {
+        color: white !important;
+    }
+    
+    /* Form labels and help text */
+    .stSelectbox label, .stTextArea label, .stTextInput label {
+        color: white !important;
+        font-weight: 500 !important;
+    }
+    
+    .stSelectbox [data-testid="stMarkdownContainer"] {
+        color: white !important;
+    }
+    
+    /* File uploader text */
+    [data-testid="stFileUploader"] label {
+        color: white !important;
+    }
+    
+    [data-testid="stFileUploader"] div {
+        color: white !important;
+    }
+    
+    /* Checkbox and radio text */
+    .stCheckbox label, .stRadio label {
+        color: white !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Checkbox text containers */
+    .stCheckbox > label {
+        color: white !important;
+    }
+    
+    .stCheckbox > label > div {
+        color: white !important;
+    }
+    
+    .stCheckbox span {
+        color: white !important;
+    }
+    
+    /* Radio button text containers */
+    .stRadio > label {
+        color: white !important;
+    }
+    
+    .stRadio > label > div {
+        color: white !important;
+    }
+    
+    .stRadio span {
+        color: white !important;
+    }
+    
+    /* All checkbox and radio descendant text */
+    .stCheckbox *, .stRadio * {
+        color: white !important;
     }
     
     /* File Uploader */
@@ -466,12 +787,24 @@ st.markdown("""
     
     /* Tables */
     .stDataFrame {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
         border-radius: 20px !important;
         overflow: hidden !important;
         box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        color: white !important;
+    }
+    
+    .stDataFrame table {
+        color: #2c3e50 !important;
+    }
+    
+    .stDataFrame th {
+        background: rgba(139, 92, 246, 0.1) !important;
+        color: #2c3e50 !important;
+    }
+    
+    .stDataFrame td {
+        color: #2c3e50 !important;
     }
     
     /* Sections */
@@ -814,12 +1147,25 @@ def load_models():
                         model_path = os.path.join(models_dir, f'{model_name.upper()}.pkl')
                         if os.path.exists(model_path):
                             try:
-                                model_class.load_state_dict(torch.load(model_path, map_location='cpu'))
+                                # Use safer loading with explicit weights_only=False to avoid torch.classes error
+                                state_dict = torch.load(model_path, map_location='cpu', weights_only=False)
+                                model_class.load_state_dict(state_dict)
                                 model_class.eval()
                                 models[model_name] = model_class
                                 model_status[model_name] = True
                             except Exception as e:
                                 st.warning(f"Failed to load {model_name.upper()} model: {e}")
+                                # Try alternative loading method for compatibility
+                                try:
+                                    # Fallback: load with pickle directly
+                                    with open(model_path, 'rb') as f:
+                                        state_dict = pickle.load(f)
+                                    model_class.load_state_dict(state_dict)
+                                    model_class.eval()
+                                    models[model_name] = model_class
+                                    model_status[model_name] = True
+                                except Exception as e2:
+                                    st.warning(f"All loading methods failed for {model_name.upper()}: {e2}")
                 except:
                     pass
         
@@ -986,18 +1332,30 @@ def create_feature_importance_chart(features):
         return fig
     return None
 
+@st.cache_data
 def create_wordcloud(text):
-    """Create word cloud visualization"""
+    """Create word cloud visualization with caching to prevent rerun issues"""
     try:
-        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+        import matplotlib
+        matplotlib.use('Agg')  # Use non-interactive backend
+        
+        wordcloud = WordCloud(
+            width=800, 
+            height=400, 
+            background_color='white',
+            max_words=100,
+            colormap='viridis'
+        ).generate(text)
         
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.imshow(wordcloud, interpolation='bilinear')
         ax.axis('off')
-        plt.title('Word Cloud')
+        plt.title('Word Cloud', fontsize=16, pad=20)
+        plt.tight_layout()
         
         return fig
-    except:
+    except Exception as e:
+        st.error(f"Error generating word cloud: {str(e)}")
         return None
 
 def get_download_link(file_bytes, file_name, file_type):
@@ -1360,142 +1718,172 @@ elif page == "🔮 Text Analysis":
         show_wordcloud = st.checkbox("☁️ Generate Word Cloud", value=False)
         enable_download = st.checkbox("📥 Enable Report Download", value=True)
     
+    # Initialize session state for analysis results
+    if 'analysis_results' not in st.session_state:
+        st.session_state.analysis_results = None
+    if 'current_text' not in st.session_state:
+        st.session_state.current_text = ""
+    if 'current_model' not in st.session_state:
+        st.session_state.current_model = ""
+
     if st.button("🔍 Analyze Text", type="primary", use_container_width=True):
         if text_input.strip():
             with st.spinner("🔄 Analyzing text..."):
                 # Make prediction
                 prediction, probabilities, confidence = make_prediction(text_input, model_choice, models)
                 
-                if prediction is not None:
-                    # Display main prediction result
-                    if prediction == 1:  # AI-generated
-                        st.markdown(
-                            f'<div class="prediction-result ai-prediction">🤖 AI-Generated Text Detected<br/>Confidence: {confidence:.2%}</div>',
-                            unsafe_allow_html=True
+                # Store results in session state
+                st.session_state.analysis_results = {
+                    'prediction': prediction,
+                    'probabilities': probabilities,
+                    'confidence': confidence,
+                    'text_stats': extract_text_statistics(text_input),
+                    'features': analyze_text_features(text_input, models.get('vectorizer'))
+                }
+                st.session_state.current_text = text_input
+                st.session_state.current_model = model_choice
+    
+    # Display results if they exist in session state
+    if st.session_state.analysis_results is not None:
+        results = st.session_state.analysis_results
+        prediction = results['prediction']
+        probabilities = results['probabilities']
+        confidence = results['confidence']
+        text_stats = results['text_stats']
+        features = results['features']
+        text_input = st.session_state.current_text
+        
+        if prediction is not None:
+            # Display main prediction result
+            if prediction == 1:  # AI-generated
+                st.markdown(
+                    f'<div class="prediction-result ai-prediction">🤖 AI-Generated Text Detected<br/>Confidence: {confidence:.2%}</div>',
+                    unsafe_allow_html=True
+                )
+            else:  # Human-written
+                st.markdown(
+                    f'<div class="prediction-result human-prediction">👤 Human-Written Text Detected<br/>Confidence: {confidence:.2%}</div>',
+                    unsafe_allow_html=True
+                )
+            
+            # Enhanced results display
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("#### 📈 Probability Scores")
+                st.metric("Human Probability", f"{probabilities[0]:.2%}")
+                st.metric("AI Probability", f"{probabilities[1]:.2%}")
+                st.metric("Confidence Score", f"{confidence:.2%}")
+            
+            with col2:
+                st.markdown("#### 📊 Confidence Visualization")
+                confidence_chart = create_confidence_chart(probabilities)
+                st.plotly_chart(confidence_chart, use_container_width=True)
+            
+            # Text Statistics Section
+            if show_statistics:
+                st.markdown("---")
+                st.markdown("#### 📊 Text Statistics")
+                
+                # Basic statistics
+                stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+                with stat_col1:
+                    st.metric("Characters", text_stats['character_count'])
+                with stat_col2:
+                    st.metric("Words", text_stats['word_count'])
+                with stat_col3:
+                    st.metric("Sentences", text_stats['sentence_count'])
+                with stat_col4:
+                    st.metric("Paragraphs", text_stats['paragraph_count'])
+                
+                # Advanced statistics
+                adv_col1, adv_col2 = st.columns(2)
+                with adv_col1:
+                    st.plotly_chart(create_text_statistics_chart(text_stats), use_container_width=True)
+                with adv_col2:
+                    st.plotly_chart(create_readability_chart(text_stats), use_container_width=True)
+            
+            # Feature Analysis Section
+            if show_features:
+                st.markdown("---")
+                st.markdown("#### 🔍 Feature Analysis")
+                
+                feature_col1, feature_col2 = st.columns(2)
+                with feature_col1:
+                    st.markdown("##### 📋 Linguistic Features")
+                    st.metric("Average Word Length", f"{features['avg_word_length']:.2f}")
+                    st.metric("Average Sentence Length", f"{features['avg_sentence_length']:.2f}")
+                    st.metric("Lexical Diversity", f"{features['lexical_diversity']:.3f}")
+                    st.metric("Function Word Ratio", f"{features['function_word_ratio']:.3f}")
+                
+                with feature_col2:
+                    feature_importance_chart = create_feature_importance_chart(features)
+                    if feature_importance_chart:
+                        st.plotly_chart(feature_importance_chart, use_container_width=True)
+            
+            # Word Cloud
+            if show_wordcloud:
+                st.markdown("---")
+                st.markdown("#### ☁️ Word Cloud")
+                wordcloud_fig = create_wordcloud(text_input)
+                if wordcloud_fig:
+                    st.pyplot(wordcloud_fig)
+            
+            # Download Reports Section
+            if enable_download:
+                st.markdown("---")
+                st.markdown('<div class="download-section">', unsafe_allow_html=True)
+                st.markdown("#### 📥 Download Comprehensive Reports")
+                
+                download_col1, download_col2 = st.columns(2)
+                
+                with download_col1:
+                    # Direct PDF download - single step
+                    try:
+                        prediction_results = {
+                            'prediction': prediction,
+                            'probabilities': probabilities,
+                            'confidence': confidence
+                        }
+                        pdf_bytes = generate_analysis_report(text_input, prediction_results, text_stats)
+                        
+                        st.download_button(
+                            label="📄 Download PDF Report",
+                            data=pdf_bytes,
+                            file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                            mime="application/pdf",
+                            use_container_width=True,
+                            help="Click to download comprehensive PDF analysis report"
                         )
-                    else:  # Human-written
-                        st.markdown(
-                            f'<div class="prediction-result human-prediction">👤 Human-Written Text Detected<br/>Confidence: {confidence:.2%}</div>',
-                            unsafe_allow_html=True
+                    except Exception as e:
+                        st.error(f"Error generating PDF report: {str(e)}")
+                
+                with download_col2:
+                    # Direct Excel download - single step
+                    try:
+                        prediction_results = {
+                            'prediction': prediction,
+                            'probabilities': probabilities,
+                            'confidence': confidence
+                        }
+                        excel_bytes = create_downloadable_excel_report(text_input, prediction_results, text_stats)
+                        
+                        st.download_button(
+                            label="📊 Download Excel Report",
+                            data=excel_bytes,
+                            file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            use_container_width=True,
+                            help="Click to download detailed Excel analysis report"
                         )
-                    
-                    # Enhanced results display
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.markdown("#### 📈 Probability Scores")
-                        st.metric("Human Probability", f"{probabilities[0]:.2%}")
-                        st.metric("AI Probability", f"{probabilities[1]:.2%}")
-                        st.metric("Confidence Score", f"{confidence:.2%}")
-                    
-                    with col2:
-                        st.markdown("#### 📊 Confidence Visualization")
-                        confidence_chart = create_confidence_chart(probabilities)
-                        st.plotly_chart(confidence_chart, use_container_width=True)
-                    
-                    # Text Statistics Section
-                    if show_statistics:
-                        st.markdown("---")
-                        st.markdown("#### 📊 Text Statistics")
-                        text_stats = safe_extract_text_statistics(text_input)
-                        
-                        # Basic statistics
-                        stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
-                        with stat_col1:
-                            st.metric("Characters", text_stats['character_count'])
-                        with stat_col2:
-                            st.metric("Words", text_stats['word_count'])
-                        with stat_col3:
-                            st.metric("Sentences", text_stats['sentence_count'])
-                        with stat_col4:
-                            st.metric("Paragraphs", text_stats['paragraph_count'])
-                        
-                        # Advanced statistics
-                        adv_col1, adv_col2 = st.columns(2)
-                        with adv_col1:
-                            st.plotly_chart(create_text_statistics_chart(text_stats), use_container_width=True)
-                        with adv_col2:
-                            st.plotly_chart(create_readability_chart(text_stats), use_container_width=True)
-                    
-                    # Feature Analysis Section
-                    if show_features:
-                        st.markdown("---")
-                        st.markdown("#### 🔍 Feature Analysis")
-                        vectorizer = models.get('vectorizer')
-                        features = analyze_text_features(text_input, vectorizer)
-                        
-                        feature_col1, feature_col2 = st.columns(2)
-                        with feature_col1:
-                            st.markdown("##### 📋 Linguistic Features")
-                            st.metric("Average Word Length", f"{features['avg_word_length']:.2f}")
-                            st.metric("Average Sentence Length", f"{features['avg_sentence_length']:.2f}")
-                            st.metric("Lexical Diversity", f"{features['lexical_diversity']:.3f}")
-                            st.metric("Function Word Ratio", f"{features['function_word_ratio']:.3f}")
-                        
-                        with feature_col2:
-                            feature_importance_chart = create_feature_importance_chart(features)
-                            if feature_importance_chart:
-                                st.plotly_chart(feature_importance_chart, use_container_width=True)
-                    
-                    # Word Cloud
-                    if show_wordcloud:
-                        st.markdown("---")
-                        st.markdown("#### ☁️ Word Cloud")
-                        wordcloud_fig = create_wordcloud(text_input)
-                        if wordcloud_fig:
-                            st.pyplot(wordcloud_fig)
-                    
-                    # Download Reports Section
-                    if enable_download:
-                        st.markdown("---")
-                        st.markdown('<div class="download-section">', unsafe_allow_html=True)
-                        st.markdown("#### 📥 Download Comprehensive Reports")
-                        
-                        download_col1, download_col2 = st.columns(2)
-                        
-                        with download_col1:
-                            # Direct PDF download - single step
-                            try:
-                                prediction_results = {
-                                    'prediction': prediction,
-                                    'probabilities': probabilities,
-                                    'confidence': confidence
-                                }
-                                pdf_bytes = generate_analysis_report(text_input, prediction_results, text_stats)
-                                
-                                st.download_button(
-                                    label="📄 Download PDF Report",
-                                    data=pdf_bytes,
-                                    file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                                    mime="application/pdf",
-                                    use_container_width=True,
-                                    help="Click to download comprehensive PDF analysis report"
-                                )
-                            except Exception as e:
-                                st.error(f"Error generating PDF report: {str(e)}")
-                        
-                        with download_col2:
-                            # Direct Excel download - single step
-                            try:
-                                prediction_results = {
-                                    'prediction': prediction,
-                                    'probabilities': probabilities,
-                                    'confidence': confidence
-                                }
-                                excel_bytes = create_downloadable_excel_report(text_input, prediction_results, text_stats)
-                                
-                                st.download_button(
-                                    label="📊 Download Excel Report",
-                                    data=excel_bytes,
-                                    file_name=f"ai_detection_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                    use_container_width=True,
-                                    help="Click to download detailed Excel analysis report"
-                                )
-                            except Exception as e:
-                                st.error(f"Error generating Excel report: {str(e)}")
-                        
-                        st.markdown('</div>', unsafe_allow_html=True)
+                    except Exception as e:
+                        st.error(f"Error generating Excel report: {str(e)}")
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+
+    else:
+        if text_input.strip():
+            st.info("👆 Click 'Analyze Text' to start the analysis")
         else:
             st.warning("⚠️ Please enter some text to analyze.")
 

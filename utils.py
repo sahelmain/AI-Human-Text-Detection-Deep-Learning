@@ -12,22 +12,47 @@ import base64
 import pickle
 from datetime import datetime
 
-def download_nltk_requirements():
-    """Download required NLTK data"""
+# NLTK Setup and Error Handling
+def setup_nltk_safely():
+    """Setup NLTK data with error handling"""
     try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        nltk.download('punkt')
-    
+        # Try to download required NLTK data
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+        nltk.download('wordnet', quiet=True)
+        nltk.download('averaged_perceptron_tagger', quiet=True)
+        nltk.download('punkt_tab', quiet=True)
+        return True
+    except Exception as e:
+        print(f"NLTK setup failed: {e}")
+        return False
+
+# Safe tokenization functions with fallbacks
+def safe_sentence_tokenize(text):
+    """Safely tokenize sentences with fallback"""
     try:
-        nltk.data.find('taggers/averaged_perceptron_tagger')
+        return nltk.sent_tokenize(text)
     except LookupError:
-        nltk.download('averaged_perceptron_tagger')
-    
+        # Fallback: simple sentence splitting
+        import re
+        sentences = re.split(r'[.!?]+', text)
+        return [s.strip() for s in sentences if s.strip()]
+    except Exception:
+        # Ultimate fallback
+        return text.split('. ')
+
+def safe_word_tokenize(text):
+    """Safely tokenize words with fallback"""
     try:
-        nltk.data.find('corpora/stopwords')
+        return nltk.word_tokenize(text)
     except LookupError:
-        nltk.download('stopwords')
+        # Fallback: simple word splitting
+        return text.split()
+    except Exception:
+        return text.split()
+
+# Initialize NLTK
+setup_nltk_safely()
 
 def extract_text_from_pdf(uploaded_file):
     """Extract text from PDF file"""
@@ -53,7 +78,6 @@ def extract_text_from_docx(uploaded_file):
 
 def extract_text_statistics(text):
     """Extract comprehensive text statistics"""
-    download_nltk_requirements()
     
     stats = {}
     
@@ -100,13 +124,12 @@ def extract_text_statistics(text):
 
 def analyze_text_features(text, vectorizer=None):
     """Analyze text features for machine learning interpretation"""
-    download_nltk_requirements()
     
     features = {}
     
-    # Basic linguistic features
-    words = text.split()
-    sentences = nltk.sent_tokenize(text)
+    # Basic linguistic features using safe tokenization
+    words = safe_word_tokenize(text)
+    sentences = safe_sentence_tokenize(text)
     
     # Length features
     features['char_count'] = len(text)
