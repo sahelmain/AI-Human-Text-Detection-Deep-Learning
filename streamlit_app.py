@@ -1412,8 +1412,8 @@ st.sidebar.markdown("""
 
 page = st.sidebar.selectbox(
     "Select Page:",
-    ["🏠 Home", "🔮 Text Analysis", "📁 File Upload", "⚖️ Model Comparison", "📊 Model Performance", "�� Advanced Analytics", "🤖 AI Agent Explanation"],
-    index=0,
+    ["🏠 Home", "🤖 AI Agent Explanation", "🔮 Text Analysis", "📁 File Upload", "⚖️ Model Comparison", "📊 Model Performance", "📈 Advanced Analytics"],
+    index=1,
     help="Choose a page to navigate to different features"
 )
 
