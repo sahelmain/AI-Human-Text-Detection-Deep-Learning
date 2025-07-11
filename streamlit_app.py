@@ -25,6 +25,10 @@ import base64
 import io
 import nltk
 
+from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+
 # Import our utility functions
 from utils import (
     extract_text_from_pdf, extract_text_from_docx, 
@@ -1408,7 +1412,7 @@ st.sidebar.markdown("""
 
 page = st.sidebar.selectbox(
     "Select Page:",
-    ["🏠 Home", "🔮 Text Analysis", "📁 File Upload", "⚖️ Model Comparison", "📊 Model Performance", "📈 Advanced Analytics"],
+    ["🏠 Home", "🔮 Text Analysis", "📁 File Upload", "⚖️ Model Comparison", "📊 Model Performance", "�� Advanced Analytics", "🤖 AI Agent Explanation"],
     index=0,
     help="Choose a page to navigate to different features"
 )
@@ -2484,6 +2488,55 @@ elif page == "📈 Advanced Analytics":
                     st.plotly_chart(confidence_chart, use_container_width=True)
         else:
             st.warning("⚠️ Please enter some text for analysis.")
+
+# AI AGENT EXPLANATION PAGE (New Feature)
+elif page == "🤖 AI Agent Explanation":
+    st.markdown("### 🤖 AI Agent Explanation")
+    st.markdown("Get AI-generated explanations for text classifications using an LLM agent.")
+
+    agent_text = st.text_area("Enter text for explained analysis:", height=200)
+
+    if st.button("Generate Explanation", type="primary"):
+        if agent_text.strip():
+            with st.spinner("Generating explanation..."):
+                # Get prediction from CNN if available, else SVM
+                agent_model = 'cnn' if 'cnn' in models else 'svm'
+                prediction, probabilities, confidence = make_prediction(agent_text, agent_model, models)
+                
+                pred_label = "AI-Generated" if prediction == 1 else "Human-Written"
+                ai_prob = probabilities[1] if len(probabilities) > 1 else confidence
+                
+                try:
+                    llm = ChatOpenAI(
+                        openai_api_key=st.secrets.get("OPENAI_API_KEY", ""),
+                        model="gpt-3.5-turbo",
+                        temperature=0.7
+                    )
+                    
+                    prompt = PromptTemplate(
+                        input_variables=["text", "prediction", "confidence"],
+                        template="You are an expert in AI text detection. Explain in detail why this text is likely {prediction} with {confidence}% confidence. Highlight key linguistic patterns, style elements, and characteristics that led to this classification. Text: {text}"
+                    )
+                    
+                    chain = LLMChain(llm=llm, prompt=prompt)
+                    
+                    explanation = chain.run(
+                        text=agent_text[:2000],  # Limit length for LLM
+                        prediction=pred_label,
+                        confidence=f"{ai_prob:.2%}"
+                    )
+                    
+                    st.markdown("#### 📝 AI Agent Explanation")
+                    st.write(explanation)
+                    
+                    st.markdown(f"**Base Prediction:** {pred_label} ({ai_prob:.2%} AI probability)")
+                    st.markdown(f"**Model Used:** {agent_model.upper()}")
+                except KeyError:
+                    st.error("⚠️ OpenAI API key not found. Please add it in Streamlit secrets.")
+                except Exception as e:
+                    st.error(f"Error generating explanation: {str(e)}")
+        else:
+            st.warning("Please enter some text.")
 
 # Footer
 st.markdown("---")
