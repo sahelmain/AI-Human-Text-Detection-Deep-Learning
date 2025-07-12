@@ -19,5 +19,6 @@ xlsxwriter>=3.0.0
 
 langchain>=0.0.1
 langchain-openai>=0.0.1
+langgraph>=0.0.1
 
 # Force rebuild for committee functionality - 2025-01-12
