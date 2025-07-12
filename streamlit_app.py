@@ -33,7 +33,11 @@ from langchain.chains import LLMChain
 from utils import (
     extract_text_from_pdf, extract_text_from_docx, 
     extract_text_statistics, analyze_text_features,
-    generate_analysis_report, create_downloadable_excel_report
+    generate_analysis_report, create_downloadable_excel_report,
+    create_bull_agent, create_bear_agent, create_supervisor_agent,
+    CNNTextClassifier, LSTMTextClassifier, RNNTextClassifier,
+    make_prediction, preprocess_text_ml, preprocess_text_dl,
+    make_ml_prediction, make_dl_prediction, ensemble_predict_tool
 )
 
 # AGGRESSIVE NLTK Data Setup for Hugging Face Spaces
@@ -2045,6 +2049,17 @@ elif page == "📁 File Upload":
 
 # MODEL COMPARISON PAGE (Enhanced)
 elif page == "⚖️ Model Comparison":
+    st.markdown("### 🤖 AI Agent Explanation")
+    st.markdown("Generate detailed explanations for model predictions.")
+    if 'detailed_results' in st.session_state:
+        selected_model = st.selectbox("Choose model for explanation:", list(st.session_state.detailed_results.keys()))
+        if st.button(f"Generate Explanation for {selected_model}", type="primary"):
+            sel_results = st.session_state.detailed_results[selected_model]
+            display_ai_explanation(st.session_state.comparison_text, sel_results['prediction'], sel_results['probabilities'], sel_results['confidence'], selected_model)
+    else:
+        st.info("Run model comparison first to enable explanations.")
+    st.markdown("---")
+
     st.markdown("### ⚖️ Comprehensive Model Comparison")
     st.markdown("Compare the performance of all available models on the same text input.")
     
@@ -2538,6 +2553,108 @@ elif page == "🤖 AI Agent Explanation":
         else:
             st.warning("Please enter some text.")
 
+    # Insert committee button after existing button
+    if st.button("Run Detection Committee", type="primary"):
+        if agent_text.strip():
+            with st.spinner("Committee analyzing..."):
+                try:
+                    # First show the actual model predictions
+                    st.markdown("### 🤖 Model Predictions")
+                    ensemble_tool = ensemble_predict_tool(models)
+                    ensemble_result = ensemble_tool.func(agent_text)
+                    
+                    # Parse and display results in a user-friendly format
+                    if "Details:" in ensemble_result:
+                        # Extract the ensemble summary
+                        summary_part = ensemble_result.split("Details:")[0].strip()
+                        st.markdown(f"**{summary_part}**")
+                        
+                        # Extract and parse the details
+                        details_part = ensemble_result.split("Details:")[1].strip()
+                        try:
+                            import ast
+                            details_dict = ast.literal_eval(details_part)
+                            
+                            # Create a formatted table
+                            model_data = []
+                            for model_name, results in details_dict.items():
+                                model_display = model_name.upper().replace('_', ' ')
+                                model_data.append({
+                                    'Model': model_display,
+                                    'Prediction': results['prediction'],
+                                    'Confidence': f"{results['confidence']:.1%}",
+                                    'AI Probability': f"{results['ai_probability']:.1%}"
+                                })
+                            
+                            # Display as a styled dataframe with better formatting
+                            df = pd.DataFrame(model_data)
+                            
+                            # Add icons to predictions
+                            df['Prediction'] = df['Prediction'].apply(lambda x: f"🤖 {x}" if x == 'AI' else f"👤 {x}")
+                            
+                            # Style the dataframe
+                            styled_df = df.style.format({
+                                'Confidence': '{}',
+                                'AI Probability': '{}'
+                            }).set_table_styles([
+                                {'selector': 'th', 'props': [('background-color', '#667eea'), ('color', 'white'), ('font-weight', 'bold'), ('text-align', 'center')]},
+                                {'selector': 'td', 'props': [('text-align', 'center'), ('padding', '8px')]},
+                                {'selector': '', 'props': [('border-collapse', 'collapse'), ('width', '100%')]}
+                            ])
+                            
+                            st.dataframe(styled_df, use_container_width=True, hide_index=True)
+                            
+                        except:
+                            # Fallback to simple display
+                            st.write(ensemble_result)
+                    else:
+                        st.write(ensemble_result)
+                    
+                    st.markdown("---")
+                    
+                    # Then run the committee analysis
+                    from utils import create_bull_agent, create_bear_agent, create_supervisor_agent
+                    bull = create_bull_agent(models)
+                    bear = create_bear_agent(models)
+                    supervisor = create_supervisor_agent(bull, bear, models)
+                    
+                    response = supervisor.invoke({"messages": [{"role": "user", "content": f"Analyze if this text is AI or human: {agent_text}"}]})
+                    
+                    st.markdown("### 🗣️ Committee Debate & Decision")
+                    
+                    # Extract the combined analysis
+                    if 'messages' in response and response['messages']:
+                        combined = response['messages'][-1].get('content') if isinstance(response['messages'][-1], dict) else response['messages'][-1].content
+                        # Split into sections
+                        sections = combined.split('\n\n')
+                        current_section = None
+                        content_dict = {'Bull Agent': '', 'Bear Agent': '', 'Supervisor Decision': ''}
+                        for section in sections:
+                            if section.startswith('Bull Agent'):
+                                current_section = 'Bull Agent'
+                                content_dict[current_section] += section + '\n\n'
+                            elif section.startswith('Bear Agent'):
+                                current_section = 'Bear Agent'
+                                content_dict[current_section] += section + '\n\n'
+                            elif section.startswith('Supervisor Decision'):
+                                current_section = 'Supervisor Decision'
+                                content_dict[current_section] += section + '\n\n'
+                            elif current_section:
+                                content_dict[current_section] += section + '\n\n'
+                        # Display in expanders
+                        with st.expander("🐂 Bull Agent (Pro-Human Analysis)", expanded=False):
+                            st.markdown(content_dict['Bull Agent'])
+                        with st.expander("🐻 Bear Agent (Pro-AI Analysis)", expanded=False):
+                            st.markdown(content_dict['Bear Agent'])
+                        with st.expander("⚖️ Supervisor Decision", expanded=True):
+                            st.markdown(content_dict['Supervisor Decision'])
+                    else:
+                        st.error("No response from committee.")
+                except Exception as e:
+                    st.error(f"Error during committee analysis: {str(e)}")
+        else:
+            st.warning("Please enter some text.")
+
 # Footer
 st.markdown("---")
 st.markdown("""
@@ -2547,3 +2664,45 @@ st.markdown("""
     <p>Features: File Upload • Advanced Analytics • Model Comparison • Report Generation</p>
 </div>
 """, unsafe_allow_html=True) 
+
+def display_ai_explanation(text, prediction, probabilities, confidence, model_name):
+    """Display AI agent explanation for text classification"""
+
+    pred_label = "AI-Generated" if prediction == 1 else "Human-Written"
+    ai_prob = probabilities[1] if len(probabilities) > 1 else confidence
+
+    with st.expander("🤖 Detailed AI Agent Explanation", expanded=True):
+        try:
+            llm = ChatOpenAI(
+                openai_api_key=st.secrets.get("OPENAI_API_KEY", ""),
+                model="gpt-3.5-turbo",
+                temperature=0.7
+            )
+
+            prompt = PromptTemplate(
+                input_variables=["text", "prediction", "confidence", "model_name"],
+                template="You are an expert in AI text detection. Using the {model_name} model, explain in detail why this text is likely {prediction} with {confidence}% confidence. Highlight key linguistic patterns, style elements, and characteristics that led to this classification. Text: {text}"
+            )
+
+            chain = LLMChain(llm=llm, prompt=prompt)
+
+            explanation = chain.run(
+                text=text[:2000],
+                prediction=pred_label,
+                confidence=f"{ai_prob:.2%}",
+                model_name=model_name.upper()
+            )
+
+            # Split explanation into parts if needed for display
+            explanation_parts = explanation.split("\n\n")  # Split on double newlines for paragraphs
+
+            for part in explanation_parts:
+                if part.strip() == "":
+                    st.write("")
+                else:
+                    st.markdown(part)
+
+        except KeyError:
+            st.error("⚠️ OpenAI API key not found. Please add it in Streamlit secrets.")
+        except Exception as e:
+            st.error(f"Error generating explanation: {str(e)}")
