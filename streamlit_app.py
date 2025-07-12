@@ -2578,34 +2578,66 @@ elif page == "🤖 AI Agent Explanation":
                             model_data = []
                             for model_name, results in details_dict.items():
                                 model_display = model_name.upper().replace('_', ' ')
+                                prediction_icon = "🤖" if results['prediction'] == 'AI' else "👤"
                                 model_data.append({
                                     'Model': model_display,
-                                    'Prediction': results['prediction'],
+                                    'Prediction': f"{prediction_icon} {results['prediction']}",
                                     'Confidence': f"{results['confidence']:.1%}",
                                     'AI Probability': f"{results['ai_probability']:.1%}"
                                 })
                             
-                            # Display as a styled dataframe with better formatting
+                            # Display as a clean dataframe
                             df = pd.DataFrame(model_data)
+                            st.dataframe(df, use_container_width=True, hide_index=True)
                             
-                            # Add icons to predictions
-                            df['Prediction'] = df['Prediction'].apply(lambda x: f"🤖 {x}" if x == 'AI' else f"👤 {x}")
-                            
-                            # Style the dataframe
-                            styled_df = df.style.format({
-                                'Confidence': '{}',
-                                'AI Probability': '{}'
-                            }).set_table_styles([
-                                {'selector': 'th', 'props': [('background-color', '#667eea'), ('color', 'white'), ('font-weight', 'bold'), ('text-align', 'center')]},
-                                {'selector': 'td', 'props': [('text-align', 'center'), ('padding', '8px')]},
-                                {'selector': '', 'props': [('border-collapse', 'collapse'), ('width', '100%')]}
-                            ])
-                            
-                            st.dataframe(styled_df, use_container_width=True, hide_index=True)
-                            
-                        except:
-                            # Fallback to simple display
-                            st.write(ensemble_result)
+                        except Exception as e:
+                            # If parsing fails, try to manually run ensemble and create table
+                            try:
+                                # Get direct ensemble results
+                                ensemble_tool = ensemble_predict_tool(models)
+                                results = {}
+                                ai_probs = []
+                                
+                                for model_name, model in models.items():
+                                    if model_name in ['vectorizer', 'vocab_to_idx', 'model_configs']:
+                                        continue
+                                    try:
+                                        prediction, probabilities, confidence = make_prediction(agent_text, model_name, models)
+                                        results[model_name] = {
+                                            'prediction': 'AI' if prediction == 1 else 'Human',
+                                            'ai_probability': probabilities[1] if len(probabilities) > 1 else confidence,
+                                            'confidence': confidence
+                                        }
+                                        ai_probs.append(results[model_name]['ai_probability'])
+                                    except:
+                                        continue
+                                
+                                if results:
+                                    # Create table from direct results
+                                    model_data = []
+                                    for model_name, res in results.items():
+                                        model_display = model_name.upper().replace('_', ' ')
+                                        prediction_icon = "🤖" if res['prediction'] == 'AI' else "👤"
+                                        model_data.append({
+                                            'Model': model_display,
+                                            'Prediction': f"{prediction_icon} {res['prediction']}",
+                                            'Confidence': f"{res['confidence']:.1%}",
+                                            'AI Probability': f"{res['ai_probability']:.1%}"
+                                        })
+                                    
+                                    df = pd.DataFrame(model_data)
+                                    st.dataframe(df, use_container_width=True, hide_index=True)
+                                    
+                                    # Show ensemble summary
+                                    if ai_probs:
+                                        avg_ai_prob = sum(ai_probs) / len(ai_probs)
+                                        ensemble_pred = 'AI' if avg_ai_prob > 0.5 else 'Human'
+                                        st.markdown(f"**Ensemble Results: Average AI Probability: {avg_ai_prob:.2%}, Prediction: {ensemble_pred}**")
+                                else:
+                                    st.write(ensemble_result)
+                            except:
+                                # Ultimate fallback
+                                st.write(ensemble_result)
                     else:
                         st.write(ensemble_result)
                     
