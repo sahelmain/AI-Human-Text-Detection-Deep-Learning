@@ -1894,6 +1894,17 @@ elif page == "🔮 Text Analysis":
         else:
             st.warning("⚠️ Please enter some text to analyze.")
 
+    # Add AI Agent Explanation integration
+    if st.session_state.analysis_results is not None:
+        if st.button("🤖 Get AI Agent Explanation", type="primary"):
+            display_ai_explanation(
+                st.session_state.current_text,
+                results['prediction'],
+                results['probabilities'],
+                results['confidence'],
+                st.session_state.current_model
+            )
+
 # FILE UPLOAD PAGE (New Feature)
 elif page == "📁 File Upload":
     st.markdown("### 📁 Document Upload & Analysis")
